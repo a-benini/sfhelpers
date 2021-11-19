@@ -1,0 +1,61 @@
+#' Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}
+#'
+#' @param x object of class \code{sf}, \code{sfc} or \code{sfg}
+#' @param y object of class \code{sf}, \code{sfc} or \code{sfg}
+#'
+#' @return Returns all parts form geometry set  \code{x} not overlapped by
+#' geometry set  \code{y}
+#'
+#' @importFrom sf st_combine st_union st_make_valid st_difference
+#'
+#' @details The example section of the \code{sf}-package help page on geometric
+#' operations on pairs of simple feature geometry sets
+#' (\code{\link[sf]{geos_binary_ops}}) presents code for a helper function that
+#' erases all parts from geometry set \code{x} overlapped by geometry set \code{y}.
+#' This function code sometimes works as expected, sometimes it doesn't.
+#' \code{st_erase_robust()} includes a fix for the diagnosed issue (s. examples
+#' below).
+#'
+#' Note that if the installed version of \code{sf} >= 1.0-1 the below example
+#' with \code{st_erase()} does no longer respond with a error message and a stop
+#' (only on macOS?). So it is unclear whether \code{st_erase_robust()} has or
+#' will become pointless, since it has not yet verified whether in future
+#'\code{st_erase()} will always work reliably.
+#'
+#' @examples
+#' library(sf)
+#' library(magrittr)
+#'
+#' # find code of helper function st_erase():
+#' ?geos_binary_ops
+#'
+#' # copy function code:
+#' st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
+#'
+#' # check if it works with demo data:
+#' \dontrun{
+#' st_erase(poly_1, poly_2)
+#' }
+#' # This throws a somewhat cryptic error message saying:
+#' #  Error in CPL_geos_op2(op, x, y) :
+#' #    Evaluation error: TopologyException: Input geom 1 is invalid:
+#' #      Self-intersection at or near point 2599750 1200250 at 2599750 1200250.
+#' # Note: If sf version >= 1.0-1 an error does not appear anymore (only on macOS?)
+#'
+#' # diagnose:
+#' st_is_valid(poly_1) %>% all() # TRUE
+#' st_is_valid(poly_2) %>% all() # TRUE
+#' # geometries of the input data (x,y) are all valid! ...
+#' st_union(st_combine(poly_2)) %>% st_is_valid() # FALSE
+#' # ... but internal processing of input y (poly_2) results in invalid geometry!
+#' # ... and the fix is done by ...
+#' ?st_make_valid()
+#'
+#' # ... which st_erase_robust() integrates:
+#' st_erase_robust(poly_1, poly_2) %>% plot()
+#' st_erase_robust(poly_2, poly_1) %>% plot()
+#'
+#' @export
+st_erase_robust <- function(x, y) {
+  sf::st_difference(x, sf::st_make_valid(sf::st_union(sf::st_combine(y))))
+}

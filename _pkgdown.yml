@@ -1,0 +1,40 @@
+title: sfhelpers
+url: https://a-benini.github.io/sfhelpers
+template:
+  params:
+    bootswatch: yeti
+reference:
+  - title: Functions
+    desc: ~
+    contents:
+      - st_bbox_common
+      - st_bbox_list
+      - st_erase_robust
+      - st_or
+      - st_rbindlist
+      - st_rename_geometry
+  - title: Datasets
+    desc: ~
+    contents:
+      - poly_1
+      - poly_2
+navbar:
+  type: inverse
+  left:
+    - icon: fa-home
+      href: index.html
+  right:
+    - icon: far fa-file-code
+      text: "Functions & Datasets"
+      href: reference/index.html
+    - text: "Articles"
+      icon: fas fa-book
+      menu:
+      -  text: Issues with `data.table::rbindlist()`
+         href: articles/rbindlist_issues.html
+    - icon: far fa-newspaper
+      text: "News"
+      href: news/index.html
+    - icon: fab fa-github fa-lg
+      text: "github"
+      href: https://github.com/a-benini/sfhelpers/

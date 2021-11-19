@@ -1,0 +1,36 @@
+Package: sfhelpers
+Title: Helper Functions for Wrapping Simple Features-Related Routines
+Version: 0.0.0.9000
+Authors@R: 
+    person("Attilio", "Benini", email = "attilio.benini@gmx.net", role = c("aut", "cre"))
+Author: Attilio Benini [aut, cre]
+Maintainer: Attilio Benini <attilio.benini@gmx.net>
+Description: Functions helping to run routines related primarily to
+    simple features (sf), but also to spatial objects of other classes / 
+    packages (raster, sp, stars).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Depends: 
+    R (>= 3.5.0)
+Imports: 
+    data.table,
+    sf,
+    tmaptools
+Suggests: 
+    dplyr,
+    knitr,
+    magrittr,
+    raster,
+    rmarkdown,
+    sp,
+    stars,
+    stats,
+    testthat (>= 3.0.0),
+    tmap
+URL: https://github.com/a-benini/sfhelpers, https://a-benini.github.io/sfhelpers/
+BugReports: https://github.com/a-benini/sfhelpers/issues
+VignetteBuilder: knitr
+Config/testthat/edition: 3

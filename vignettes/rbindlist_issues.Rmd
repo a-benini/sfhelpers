@@ -1,0 +1,248 @@
+---
+title: "Issues with `data.table::rbindlist()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: no
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{rbindlist_issues}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+Sys.setenv(LANG = "en_US.UTF-8")
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+## Introduction
+
+`sf::st_as_sf(data.table::rbindllist(<list_of_sf>))` is a 
+[fast alternative](https://github.com/r-spatial/sf/issues/798#)
+to `do.call(rbind, <list_of_sf>)` for binding `list`s of simple features objects
+(`sf`) to single `sf`. However, there are some pitfalls when `rbindlist()` is
+applied to `list`s of `sf`. These are explored, and some workarounds are
+presented.
+ 
+## Packages required
+
+```{r setup}
+library(magrittr)
+library(dplyr)
+library(data.table)
+library(sf)
+```
+
+## Compare `rbindlist()` and `do.call()`
+
+### Inherited classes and `bbox`
+
+We create a `list` of `sf`:
+
+```{r list-sf-sfc}
+nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
+
+list_of_sf <- lapply(seq_along(nc[[1]]) , function(x) nc[x, ])
+```
+
+Binding these `list`s of `sf` with `do.call()` to a single `sf` object works easily
+(as long as the `list` is rather small): 
+
+```{r do-call-bind-c}
+nc_do.call <- do.call(rbind, list_of_sf)
+```
+
+And will return the expected objects of the classes `sf`:
+
+```{r check-do-call-returns}
+all.equal(nc_do.call, nc)
+```
+
+What's different when `rbindlist()` is used instead of `do.call()`?
+
+First of all, `rbindlist()` on its own does not bind a `list` of `sf` to an
+object of the class `sf`:
+
+```{r rbindlist-drops-sf}
+rbindlist(list_of_sf) %>% class()
+```
+
+Thus, subsequently the return of `rbindlist()` needs to be converted into an 
+object of the the class `sf`:
+
+```{r rbindlist-st-as-sf-pipe}
+nc_rbindlist <- rbindlist(list_of_sf) %>% st_as_sf()
+```
+
+Is the return of the pipe `rbindlist() %>% st_as_sf()` equivalent to the one of
+`do.call()`?
+
+```{r check-rbindlist-st-as-sf-return}
+all.equal(nc_rbindlist, nc)
+```
+
+No, not really! The pipe-output has inherited the class `data.table`:
+
+```{r class-sf-pipe}
+class(nc)
+class(nc_rbindlist)
+```
+
+Will omitting the class `data.table` eliminate the difference?
+
+```{r omit-class-data-table}
+class(nc_rbindlist) <- c("sf", "data.frame")
+all.equal(nc_rbindlist, nc)
+```
+
+There's also an issue with `bbox` of the geometry column:
+
+```{r bbox-issue}
+st_bbox(nc_rbindlist) == st_bbox(nc)
+```
+
+`data.table::rbindlist()` sets the `bbox` of the first object in the geometry
+column as the  `bbox` of the whole coloum:
+
+```{r bbox-issue-2}
+st_bbox(nc_rbindlist) == st_bbox(nc_rbindlist[1, ])
+```
+
+A [simple trick](https://github.com/Rdatatable/data.table/issues/4681) solves
+this issue inherent to `sf`-objects originating from `data.table`s:
+
+```{r bbox-issue-3, eval = FALSE}
+sf_once_dt <- sf_once_dt[1:nrow(sf_once_dt), ]
+# or
+sf_once_dt <- sf_once_dt[seq_along(sf_once_dt[[1]]), ]
+```
+
+We apply the trick ...
+
+```{r bbox-issue-4}
+nc_rbindlist <- nc_rbindlist[seq_along(nc_rbindlist[[1]]), ]
+```
+
+... check if it worked:
+
+```{r check-2}
+all.equal(nc_rbindlist, nc)
+```
+
+### CRS
+
+`list`s containing `sf`-objects with different CRS are treated quite differently
+by `do.call()` and `rbindlist() %>% st_as_sf`. To demonstrate that, we create
+such a `list`:
+
+```{r unequal-crs}
+nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
+
+nc_3857 <- st_transform(nc, 3857)
+
+list_of_sf_with_unequal_crs <- list(nc, nc_3857)
+```
+
+`do.call()` does not bind a `list` of `sf`-objects with unequal CRS and throws a
+corresponding error-message:
+
+```{r error = TRUE}
+do.call(rbind, list_of_sf_with_unequal_crs)
+```
+
+Whereas the pipe `rbindlist() %>% st_as_sf` doesn't seem to be affected: 
+
+```{r}
+sf_dt <- list_of_sf_with_unequal_crs %>% rbindlist() %>% st_as_sf()
+```
+
+The returned object of the classes `sf` and `data.table` has a CRS which is the
+same as the one of first `list`ed `sf`-object:
+
+```{r}
+st_crs(sf_dt)$epsg
+st_crs(sf_dt) == st_crs(nc)
+```
+
+If we reverse the sequence of elements of the `list` of `sf`-objects with
+unequal CRS the newly first placed `sf`-object dictates the CRS of the by 
+`rbindlist() %>% st_as_sf` bound single `sf`-object:
+
+```{r}
+sf_dt <- list_of_sf_with_unequal_crs %>% rev() %>% rbindlist() %>% st_as_sf()
+st_crs(sf_dt)$epsg
+st_crs(sf_dt) == st_crs(nc_3857)
+```
+
+The maloperation of `rbindlist()` regarding `list`s of `sf`-objects with
+different CRS can't be handled after the fact. Thus, feeding such a `list` to
+`rbindlist()` must be avoided. Hence prior checking if a `list` of `sf` contains
+more than 1 CRS is crucial:
+
+```{r}
+list(nc, nc_3857) %>% lapply(st_crs) %>% n_distinct()
+```
+
+## Conclusions
+
+The use of `data.table::rbindlist()` as a fast alternative to `do.call()` for
+binding `list`s of `sf`-objects to a single `sf`-object is justified in
+situations when `do.call()` is too slow. It does however require appropriate
+pre- and post-treatment:
+
+1. Check if a `list` of `sf`-objects contains more than 1 distinct CRS:
+
+```{r eval = FALSE}
+list_of_sf %>% lapply(st_crs) %>% n_distinct()
+```
+
+If so, CRS-unification needs to be done before moving on.
+
+```{r eval = FALSE}
+?st_transform
+?st_crs
+```
+
+2. Bind `list` of `sf`-objects to a single `sf`-object (which is also a
+`data.table`):
+
+```{r eval = FALSE}
+list_of_sf %>% rbindlist() %>% st_as_sf() -> sf_object
+```
+
+3. Fix bounding box / `bbox`:
+
+```{r eval = FALSE}
+sf_object <- sf_object[1:nrow(sf_object), ]
+# or
+sf_object <- sf_object[seq_along(sf_object[[1]]), ]
+```
+
+4. If required omit class `data.table`:
+
+```{r eval = FALSE}
+class(sf_object) <- c("sf", "data.frame")
+```
+
+Note that these above four steps are integrated in the function
+`sfhelpers::st_rbindlist()` enabling a painless and fast conversion of a `list`
+of `sf` objects to a single `sf` object. Moreover `st_rbindlist()` has argument
+options capable of handling `list`s of `sf` objects that differ by the names and
+positions of their geometry and other attribute columns.
+
+```{r eval = FALSE}
+?st_rbindlist
+```
+
+## Links
+
+* [bind_rows_sf for combining lists of sf objects to single dataframe](https://github.com/r-spatial/sf/issues/798#)
+
+* [rbindlist gets wrong bbox when binding a list of sf data frames](https://github.com/Rdatatable/data.table/issues/4681)
+
+* [crs handling in combine_list_of_sf](https://github.com/r-spatial/mapedit/issues/46)

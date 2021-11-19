@@ -1,0 +1,14 @@
+# sfhelpers 0.0.0.9000
+* 1st release on GitHub
+* 6 functions
+  - `st_bbox_common()`
+  - `st_bbox_list()`
+  - `st_erase_robust()`
+  - `st_or()`
+  - `st_rbindlist()`
+  - `st_rename_geometry()`
+* 2 demo `sf` objects with partly identically named attribute columns and party overlapping geometries / polygons
+  - `poly_1`
+  - `poly_2`
+* 1 vignette
+  - `rbindlist_issues` detailing some issues and workarounds related to `sf::st_as_sf(data.table::rbindllist(<list_of_sf>))`

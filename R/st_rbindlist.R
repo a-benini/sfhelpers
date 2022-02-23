@@ -154,7 +154,7 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, use_any_geometry = FALSE,
   if(!(is.null(geometry_name) | (is.character(geometry_name) & length(geometry_name) == 1))){
     stop("geometry_name must be either NULL or a single character string", call. = FALSE)
   }
-  if (!all(vapply(l, function(x) { ("sf" %in% class(x)) | is.null(x) }, logical(1)))) {
+  if (!all(vapply(l, function(x) { inherits(x, "sf") | is.null(x) }, logical(1)))) {
     stop("not all listed objects are of the class sf", call. = FALSE)
   }
   is_not_null <- !vapply(l, is.null, logical(1))

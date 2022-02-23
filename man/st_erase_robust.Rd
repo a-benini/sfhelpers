@@ -4,12 +4,17 @@
 \alias{st_erase_robust}
 \title{Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}}
 \usage{
-st_erase_robust(x, y)
+st_erase_robust(x, y, check_overlap = FALSE)
 }
 \arguments{
 \item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 
 \item{y}{object of class \code{sf}, \code{sfc} or \code{sfg}}
+
+\item{check_overlap}{\code{TRUE} detects those geometries included in
+\code{x} and \code{y} which overlap with the other input layer and applies
+geometric operations only on these; \code{FALSE} (default) applies geometric
+operations on all geometries (s. Details).}
 }
 \value{
 Returns all parts of geometry set \code{x} not overlapped by
@@ -42,6 +47,20 @@ Note that with the recent versions of \code{sf} (>= 1.0-1), although
 \code{st_union(st_combine())} might very well return an invalid geometry,
 experience made so far shows that this has become less of an obstacle for
 further prepossessing with \code{\link[sf]{st_difference}}.
+
+In case of a significant proportion of non-overlapping geometries, setting
+\code{check_overlap} to \code{TRUE} can shorten run time. As the internal
+distinction of overlapping and non-overlapping geometries relies on
+\code{\link[sf]{st_intersects}}, which itself is time consuming,
+\code{check_overlap = TRUE} involves a trade off: If all geometries overlap,
+\code{check_overlap = TRUE} will only increase the run time. On the other
+hand, the higher the proportion of non-overlapping geometries, the more this
+argument specification shortens the processing time by leaving out
+unnecessary geometric operations. Ideally the user has previous knowledge
+about how little or how much the input layers \code{x} and \code{y} overlap
+with each other in order to apply \code{check_overlap} in a informed way. In
+general setting \code{check_overlap} to \code{TRUE} is advantageous when
+\code{x} and/or \code{y} are larger geometry sets and include more complex
 }
 \examples{
 library(sf)

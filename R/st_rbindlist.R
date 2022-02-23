@@ -20,8 +20,9 @@
 #'
 #' @export
 #'
-#' @importFrom data.table rbindlist
+#' @importFrom data.table as.data.table rbindlist
 #' @importFrom sf st_as_sf st_crs st_geometry_type st_geometry st_drop_geometry st_sf
+#' @importFrom uuid UUIDgenerate
 #'
 #' @details \code{st_rbindlist()} is basically a wrapper for
 #' \code{sf::st_as_sf(data.table::rbindlist(<list_of_sf>))}, which is a fast
@@ -166,7 +167,7 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, use_any_geometry = FALSE,
   }
   if(use_geometry == FALSE & use_any_geometry == FALSE){
     sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
-    sf <- sf[seq_along(sf[[1]]), ]
+    sf <- sf[seq_len(nrow(sf)), ]
     class(sf) <- c("sf", "data.frame")
   } else {
     if(use_any_geometry == FALSE){
@@ -175,10 +176,11 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, use_any_geometry = FALSE,
       }
     }
     geometry <- do.call(c, lapply(l[is_not_null], sf::st_geometry))
-    get_non_geometry <- function(x) {if(is.null(x)) {NULL} else {data.frame(sf::st_drop_geometry(x), tmp_col_to_avoid_df_with_zero_col = rep(NA, nrow(x)))} }
+    tmp_col <- uuid::UUIDgenerate()
+    get_non_geometry <- function(x) { if(is.null(x)) {x} else {data.table::as.data.table(sf::st_drop_geometry(x), keep.rownames = tmp_col)} }
     non_geometry <- data.table::rbindlist(lapply(l, get_non_geometry), ...)
     sf <- sf::st_sf(non_geometry, geometry)
-    sf$tmp_col_to_avoid_df_with_zero_col <- NULL
+    sf <- sf[ ,names(sf) != tmp_col]
   }
   if(!is.null(geometry_name)){
     names(sf)[names(sf) == attr(sf, "sf_column")] <- geometry_name

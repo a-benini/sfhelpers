@@ -12,8 +12,8 @@ st_erase_robust(x, y)
 \item{y}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 }
 \value{
-Returns all parts form geometry set  \code{x} not overlapped by
-geometry set  \code{y}
+Returns all parts of geometry set \code{x} not overlapped by
+geometry set \code{y}
 }
 \description{
 Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}
@@ -23,19 +23,28 @@ The example section of the \code{sf}-package help page on geometric
 operations on pairs of simple feature geometry sets
 (\code{\link[sf]{geos_binary_ops}}) presents code for a helper function that
 erases all parts from geometry set \code{x} overlapped by geometry set \code{y}.
-This function code sometimes works as expected, sometimes it doesn't.
-\code{st_erase_robust()} includes a fix for the diagnosed issue (s. examples
+This function sometimes works as expected, sometimes it doesn't. (s. examples
 below).
 
-Note that if the installed version of \code{sf} >= 1.0-1 the below example
-with \code{st_erase()} does no longer respond with a error message and a stop
-(only on macOS?). So it is unclear whether \code{st_erase_robust()} has or
-will become pointless, since it has not yet verified whether in future
-\code{st_erase()} will always work reliably.
+Even when both input layers \code{x} and \code{y} consist of valid
+geometries (which can be checked with \code{\link[sf]{st_is_valid}},
+respectively fixed with \code{\link[sf]{st_make_valid}}), the a. m. helper
+function can still throw an error. This is often due to internally applying
+\code{st_union(st_combine())} to \code{y}. So, currently
+\code{st_erase_robust()} uses in case of failure as a second option
+\code{\link[sf]{st_union}} only. Leaving out \code{\link[sf]{st_combine}}
+may very well add to the complexity of the involved geometries; thus the
+second option may be rather slow. For this reason, if the coordinates of the
+input are longlat degrees, setting \code{\link[sf]{sf_use_s2}} to
+\code{FALSE} can help to speed up \code{st_erase_robust()} (s.examples below).
+
+Note that with the recent versions of \code{sf} (>= 1.0-1), although
+\code{st_union(st_combine())} might very well return an invalid geometry,
+experience made so far shows that this has become less of an obstacle for
+further prepossessing with \code{\link[sf]{st_difference}}.
 }
 \examples{
 library(sf)
-library(magrittr)
 
 # find code of helper function st_erase():
 ?geos_binary_ops
@@ -43,27 +52,35 @@ library(magrittr)
 # copy function code:
 st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
-# check if it works with demo data:
+# get some demo data:
+nc   <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
+ext  <- st_bbox(nc) + rep(c(-0.1, 0.1), each = 2)
+grid <- st_make_grid(ext) \%>\% st_sf(id = seq_along(.), geom = ., agr = "constant")
+
+st_is_longlat(nc) # demo data has a longlat degrees crs
+
+sf_use_s2(TRUE)
+# check if helper function works with demo data:
 \dontrun{
-st_erase(poly_1, poly_2)
+st_erase(grid, nc)
 }
-# This throws a somewhat cryptic error message saying:
-#  Error in CPL_geos_op2(op, x, y) :
-#    Evaluation error: TopologyException: Input geom 1 is invalid:
-#      Self-intersection at or near point 2599750 1200250 at 2599750 1200250.
-# Note: If sf version >= 1.0-1 an error does not appear anymore (only on macOS?)
 
-# diagnose:
-st_is_valid(poly_1) \%>\% all() # TRUE
-st_is_valid(poly_2) \%>\% all() # TRUE
-# geometries of the input data (x,y) are all valid! ...
-st_union(st_combine(poly_2)) \%>\% st_is_valid() # FALSE
-# ... but internal processing of input y (poly_2) results in invalid geometry!
-# ... and the fix is done by ...
-?st_make_valid()
+# internal processing of input y (nc) returns the same error as st_erase():
+\dontrun{
+st_union(st_combine(nc))
+}
 
-# ... which st_erase_robust() integrates:
-st_erase_robust(poly_1, poly_2) \%>\% plot()
-st_erase_robust(poly_2, poly_1) \%>\% plot()
+# st_erase_robust() can handle this:
+st_erase_robust(grid, nc) \%>\% plot()
 
+sf_use_s2(FALSE) # if spherical geometry (s2) is switched off,
+# sfhelpers::st_erase_robust() & helper function st_erase() work and return
+# the same:
+all.equal(
+ st_erase_robust(grid, nc),
+ st_erase(grid, nc)
+)
+
+# because internal handling of input y (nc) won't throw an error:
+st_union(st_combine(nc))
 }

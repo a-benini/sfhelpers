@@ -56,7 +56,8 @@ test_that("test-st_erase_robust", {
 
   # ----------------------------------------------------------------------------
   # issues of sfhelpers version 0.0.0.9000 with st_erase_robust() /
-  # sf::st_combine() / st::st_make_valid() / sf::sf_use_s2()
+  # sf::st_combine() / st::st_make_valid() / sf::sf_use_s2() fixed for
+  # version >= 0.0.0.9001:
   grid_n3 <- st_make_grid(poly_2, n = 3)
 
   # library(tmap)
@@ -64,35 +65,23 @@ test_that("test-st_erase_robust", {
   # tm_shape(poly_1[1, ], bbox = grid_n3) + tm_polygons() +
   #   tm_shape(grid_n3) + tm_borders(col = "red")
 
+  # total erase by y works, if it includes surfaces touched on all side by other
+  # surfaces:
   expected_total_erase <- st_erase_robust(poly_1[1, ], grid_n3)
-  expect_false(nrow(expected_total_erase) == 0)
-  eq <- st_equals(expected_total_erase, grid_n3)
-  expect_false(lengths(eq) == 0)
-  y_internal <- sf::st_make_valid(sf::st_union(sf::st_combine(grid_n3)))
-  # plot(y_internal) # center surface missing!
-  # st_geometry_type(y_internal) # 1 GEOMETRYCOLLECTION
-  # st_union(st_combine(grid_n3)) %>% plot(col = "gray") # all surfaces kept!
-  expect_false(
-    st_union(st_combine(grid_n3)) %>% st_is_valid()
-  ) # but geometry invalid!
-  expect_false(
-    st_combine(grid_n3) %>% st_is_valid()
-  ) # due to st_combine()
-  expect_equal( # without st_make_valid() total erase works as expected!
-    st_erase(poly_1[1, ], grid_n3) %>% nrow(),
-    0
-  )
+  expect_true(nrow(expected_total_erase) == 0)
 
-  nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
+  nc         <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
   st_agr(nc) <- "constant"
   expect_true(st_is_longlat(nc))
-  ext <- st_bbox(nc) + rep(c(-0.1, 0.1), each = 2)
-  grid <- st_make_grid(ext) %>% st_sf(id = seq_along(.), geom = ., agr = "constant")
+  ext        <- st_bbox(nc) + rep(c(-0.1, 0.1), each = 2)
+  grid       <- st_make_grid(ext) %>% st_sf(id = seq_along(.), geom = ., agr = "constant")
 
   sf_use_s2(TRUE)
-  # 3 times the same error massage:
-  # st_erase_robust(grid, nc)
-  expect_error(st_erase_robust(grid, nc))
+  erased_robust_s2_true <- st_erase_robust(grid, nc) # doesn't throw an error any more!
+  # plot(erased_robust_s2_true) # erased as expected!
+  area_ratio <- sum(st_area(erased_robust_s2_true)) / (sum(st_area(grid)) - sum(st_area(nc)))
+  expect_equal(as.numeric(round(area_ratio, 6)), 1) # erase by area close to 1
+  # reminder for common issue of st_erase() & st_erase_robust() (sfhelpers version 0.0.0.9000):
   # st_erase(grid, nc)
   expect_error(st_erase(grid, nc))
   # st_union(st_combine(nc)) # cause of error!
@@ -101,14 +90,15 @@ test_that("test-st_erase_robust", {
   expect_false(st_is_valid(st_combine(nc))) # but returns invalid geometry (but this isn't causing a stop/error)
 
   sf_use_s2(FALSE)
-  erased_robust <- st_erase_robust(grid, nc)
-  # plot(erased_robust) # erase done incompletely!
-  area_ratio <- sum(st_area(erased_robust)) / (sum(st_area(grid)) - sum(st_area(nc)))
-  expect_equal(as.numeric(round(area_ratio, 6)), 1.297856) # erase by area definitely wrong
-  erased <- st_erase(grid, nc)
-  # plot(erased) # erase done completely!
-  area_ratio <- sum(st_area(erased)) / (sum(st_area(grid)) - sum(st_area(nc)))
+  erased_robust_s2_false <- st_erase_robust(grid, nc)
+  # plot(erased_robust_s2_true) # erased as expected!
+  area_ratio <- sum(st_area(erased_robust_s2_false)) / (sum(st_area(grid)) - sum(st_area(nc)))
   expect_equal(as.numeric(round(area_ratio, 6)), 0.999985) # erase by area close to 1
+  # if  sf_use_s2() == FALSE st_erase_robust() does the same as st_erase():
+  expect_equal(
+    erased_robust_s2_false,
+    st_erase(grid, nc)
+  )
   # ----------------------------------------------------------------------------
 })
 

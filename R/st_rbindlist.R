@@ -183,14 +183,12 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, use_any_geometry = FALSE,
     sf <- sf[ ,names(sf) != tmp_col]
   }
   if(!is.null(geometry_name)){
-    names(sf)[names(sf) == attr(sf, "sf_column")] <- geometry_name
-    sf::st_geometry(sf) <- geometry_name
+    sf <- st_rename_geom(sf, geometry_name)
   }
-  if(is.null(geometry_name) & (use_geometry | use_any_geometry)){
+  if(is.null(geometry_name) & use_geometry){
     geometry_names_unique <- unique(vapply(l[is_not_null], attr, which = "sf_column", character(1)))
     if(length(geometry_names_unique) == 1){
-      names(sf)[names(sf) == "geometry"] <- geometry_names_unique
-      sf::st_geometry(sf) <- geometry_names_unique
+      sf <- st_rename_geom(sf, geometry_names_unique)
     }
   }
   return(sf)

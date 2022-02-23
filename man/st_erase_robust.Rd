@@ -4,7 +4,7 @@
 \alias{st_erase_robust}
 \title{Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}}
 \usage{
-st_erase_robust(x, y, check_overlap = FALSE)
+st_erase_robust(x, y, check_overlap = FALSE, ...)
 }
 \arguments{
 \item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
@@ -15,6 +15,8 @@ st_erase_robust(x, y, check_overlap = FALSE)
 \code{x} and \code{y} which overlap with the other input layer and applies
 geometric operations only on these; \code{FALSE} (default) applies geometric
 operations on all geometries (s. Details).}
+
+\item{...}{arguments passed on to \code{\link[s2]{s2_options}}}
 }
 \value{
 Returns all parts of geometry set \code{x} not overlapped by
@@ -61,6 +63,7 @@ about how little or how much the input layers \code{x} and \code{y} overlap
 with each other in order to apply \code{check_overlap} in a informed way. In
 general setting \code{check_overlap} to \code{TRUE} is advantageous when
 \code{x} and/or \code{y} are larger geometry sets and include more complex
+geometries.
 }
 \examples{
 library(sf)

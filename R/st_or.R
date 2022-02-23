@@ -132,18 +132,15 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     )
   }
 
-  # make sure that homonymous attributes of x and y both get a distinct suffix
-  x_names <- names(x)
-  y_names <- names(y)
-  x_agr   <- names(attr(x, "agr"))
-  y_agr   <- names(attr(y, "agr"))
-  if (suffix.all) {
-    names(x) <- ifelse(x_names %in% x_agr, paste0(x_names, x.suffix), x_names)
-    names(y) <- ifelse(y_names %in% y_agr, paste0(y_names, y.suffix), y_names)
-  } else {
-    names(x) <- ifelse(x_names %in% y_agr, paste0(x_names, x.suffix), x_names)
-    names(y) <- ifelse(y_names %in% x_agr, paste0(y_names, y.suffix), y_names)
+  # make sure that (homonymous) attributes of x and y both get a distinct suffix
+  x_agr <- names(attr(x, "agr"))
+  y_agr <- names(attr(y, "agr"))
+  if (suffix.all == FALSE) { # if only homonymous attributes get a distinct suffix
+    x_agr <- base::intersect(x_agr, y_agr)
+    y_agr <- x_agr
   }
+  names(x) <- ifelse(names(x) %in% x_agr, paste0(names(x), x.suffix), names(x))
+  names(y) <- ifelse(names(y) %in% y_agr, paste0(names(y), y.suffix), names(y))
 
   # avoid getting repented warnings about non-constant attribute variables
   # assumed to be constant

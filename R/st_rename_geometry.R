@@ -25,12 +25,16 @@
 #' attr(poly_1, "sf_column")
 #' st_rename_geometry(poly_1, "renamed_geometry")
 st_rename_geometry <- function(obj, geometry_name) {
-  if (!"sf" %in% class(obj)) {
+  if (!inherits(obj, "sf")) {
     stop("the argument obj must be of the class sf", call. = FALSE)
   }
   if (!(is.character(geometry_name) & length(geometry_name) == 1)) {
     stop("the argument geometry_name must be a single character string", call. = FALSE)
   }
+  st_rename_geom(obj, geometry_name)
+}
+# helper function for pkg-internal use
+st_rename_geom <- function(obj, geometry_name) {
   names(obj)[names(obj) == attr(obj, "sf_column")] <- geometry_name
   sf::st_geometry(obj) <- geometry_name
   return(obj)

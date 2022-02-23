@@ -32,7 +32,6 @@ presented.
 ## Packages required
 
 ```{r setup}
-library(magrittr)
 library(dplyr)
 library(data.table)
 library(sf)
@@ -42,22 +41,22 @@ library(sf)
 
 ### Inherited classes and `bbox`
 
-We create a `list` of `sf`:
+We create a `list` of `sf` objects:
 
 ```{r list-sf-sfc}
 nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 
-list_of_sf <- lapply(seq_along(nc[[1]]) , function(x) nc[x, ])
+list_of_sf <- lapply(seq_len(nrow(nc)), function(x) nc[x, ])
 ```
 
-Binding these `list`s of `sf` with `do.call()` to a single `sf` object works easily
+Binding such a `list` of `sf` with `do.call()` to a single `sf` object works easily
 (as long as the `list` is rather small): 
 
 ```{r do-call-bind-c}
 nc_do.call <- do.call(rbind, list_of_sf)
 ```
 
-And will return the expected objects of the classes `sf`:
+And will return the expected object of the class `sf`:
 
 ```{r check-do-call-returns}
 all.equal(nc_do.call, nc)
@@ -106,26 +105,27 @@ There's also an issue with `bbox` of the geometry column:
 st_bbox(nc_rbindlist) == st_bbox(nc)
 ```
 
-`data.table::rbindlist()` sets the `bbox` of the first object in the geometry
-column as the  `bbox` of the whole coloum:
+Instead of returning the correct `bbox` for the whole geometry column,
+`data.table::rbindlist()` simply copies the `bbox` of the first `list`ed
+`sf` object:
 
 ```{r bbox-issue-2}
-st_bbox(nc_rbindlist) == st_bbox(nc_rbindlist[1, ])
+st_bbox(nc_rbindlist) == st_bbox(list_of_sf[[1]])
 ```
 
 A [simple trick](https://github.com/Rdatatable/data.table/issues/4681) solves
-this issue inherent to `sf`-objects originating from `data.table`s:
+this issue inherent to `sf`-objects compiled with `data.table::rbindlist()`:
 
 ```{r bbox-issue-3, eval = FALSE}
-sf_once_dt <- sf_once_dt[1:nrow(sf_once_dt), ]
-# or
-sf_once_dt <- sf_once_dt[seq_along(sf_once_dt[[1]]), ]
+sf_former_dt <- sf_former_dt[1:nrow(sf_former_dt), ]
+# or, preferable in a programming context:
+sf_former_dt <- sf_former_dt[seq_len(nrow(sf_former_dt)), ]
 ```
 
 We apply the trick ...
 
 ```{r bbox-issue-4}
-nc_rbindlist <- nc_rbindlist[seq_along(nc_rbindlist[[1]]), ]
+nc_rbindlist <- nc_rbindlist[seq_len(nrow(nc_rbindlist)), ]
 ```
 
 ... check if it worked:
@@ -137,7 +137,7 @@ all.equal(nc_rbindlist, nc)
 ### CRS
 
 `list`s containing `sf`-objects with different CRS are treated quite differently
-by `do.call()` and `rbindlist() %>% st_as_sf`. To demonstrate that, we create
+by `do.call()` and `rbindlist() %>% st_as_sf()`. To demonstrate that, we create
 such a `list`:
 
 ```{r unequal-crs}
@@ -188,11 +188,62 @@ more than 1 CRS is crucial:
 list(nc, nc_3857) %>% lapply(st_crs) %>% n_distinct()
 ```
 
+
+### Different `geometry_type`s
+
+A `list` with `sf`-objects having geometry columns of different `geometry_type`s:
+
+```{r}
+l_diff_geom_type <- list(nc[1:3, ], st_cast(nc[4, ], "POLYGON", warn = FALSE))
+
+sapply(l_diff_geom_type, st_geometry_type, by_geometry = FALSE) %>% unique()
+```
+
+`do.call()` can easily stack such a `list` and the returned `geometry_type` is
+`GEOMETRY`:
+
+```{r}
+sf_do.call <- do.call(rbind, l_diff_geom_type)
+
+st_geometry_type(sf_do.call, by_geometry = FALSE)
+```
+
+But `rbindlist()` can't handle a `list` containing different `geometry_type`s:
+
+```{r, error=TRUE}
+rbindlist(l_diff_geom_type)
+```
+
+In order to make such a `list` workable for `rbindlist()`, the `geometry_type`s
+have to be homogenized:
+
+```{r}
+l_homogenized_geom_type <- lapply(l_diff_geom_type, st_cast, to = "GEOMETRY", warn = FALSE)
+
+sapply(l_homogenized_geom_type, st_geometry_type, by_geometry = FALSE) %>% unique()
+```
+
+Once the `list`ed `sf`-objects have the same `geometry_type`, `rbindlist()` can
+stack them:
+
+```{r}
+sf_rbindlist <- rbindlist(l_homogenized_geom_type) %>% st_as_sf()
+
+st_geometry_type(sf_rbindlist, by_geometry = FALSE)
+```
+
+```{r, eval = FALSE, echo = FALSE}
+sf_rbindlist            <- sf_rbindlist[1:nrow(sf_rbindlist), ]
+class(sf_rbindlist)     <- c("sf", "data.frame")
+row.names(sf_rbindlist) <- row.names(sf_do.call)
+all.equal(sf_rbindlist, sf_do.call)
+```
+
 ## Conclusions
 
 The use of `data.table::rbindlist()` as a fast alternative to `do.call()` for
 binding `list`s of `sf`-objects to a single `sf`-object is justified in
-situations when `do.call()` is too slow. It does however require appropriate
+situations when `do.call()` is too slow. It does, however, require appropriate
 pre- and post-treatment:
 
 1. Check if a `list` of `sf`-objects contains more than 1 distinct CRS:
@@ -208,35 +259,47 @@ If so, CRS-unification needs to be done before moving on.
 ?st_crs
 ```
 
-2. Bind `list` of `sf`-objects to a single `sf`-object (which is also a
+2. Check if the `list`ed `sf`-objects have different `geometry_type`s:
+
+```{r eval = FALSE}
+sapply(list_of_sf, st_geometry_type, by_geometry = FALSE) %>% unique()
+```
+
+If so, homogenize them:
+
+```{r eval = FALSE}
+list_of_sf <- lapply(list_of_sf, st_cast, to = "GEOMETRY", warn = FALSE)
+```
+
+3. Bind `list` of `sf`-objects to a single `sf`-object (which is also a
 `data.table`):
 
 ```{r eval = FALSE}
 list_of_sf %>% rbindlist() %>% st_as_sf() -> sf_object
 ```
 
-3. Fix bounding box / `bbox`:
+4. Fix bounding box / `bbox`:
 
 ```{r eval = FALSE}
 sf_object <- sf_object[1:nrow(sf_object), ]
-# or
-sf_object <- sf_object[seq_along(sf_object[[1]]), ]
+# or, preferable in a programming context:
+sf_object <- sf_object[seq_len(nrow(sf_object)), ]
 ```
 
-4. If required omit class `data.table`:
+5. If required, omit class `data.table`:
 
 ```{r eval = FALSE}
 class(sf_object) <- c("sf", "data.frame")
 ```
 
-Note that these above four steps are integrated in the function
+Note that those five steps are integrated in the function
 `sfhelpers::st_rbindlist()` enabling a painless and fast conversion of a `list`
 of `sf` objects to a single `sf` object. Moreover `st_rbindlist()` has argument
 options capable of handling `list`s of `sf` objects that differ by the names and
 positions of their geometry and other attribute columns.
 
 ```{r eval = FALSE}
-?st_rbindlist
+?sfhelpers::st_rbindlist
 ```
 
 ## Links

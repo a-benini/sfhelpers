@@ -3,6 +3,7 @@ test_that("test-st_bbox_list", {
   library(sp)
   library(raster)
   library(stars)
+  library(terra)
   library(dplyr)
   nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 
@@ -54,5 +55,13 @@ test_that("test-st_bbox_list", {
   expect_error(
     st_bbox_list(list(nc, bbox_with_NA)),
     "at least one of the listed arguments has one or more missing values for its bbox object"
+  )
+
+  # with classes from terra pkg
+  rast <- rast(r)  # class SpatRaster
+  vect <- vect(sf) # class SpatVector
+  expect_equal(
+    st_bbox_list(list(r, sf)),
+    st_bbox_list(list(rast, vect))
   )
 })

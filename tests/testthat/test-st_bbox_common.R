@@ -3,6 +3,7 @@ test_that("test-st_bbox_common", {
   library(sp)
   library(raster)
   library(stars)
+  library(terra)
   library(dplyr)
   nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 
@@ -49,4 +50,12 @@ test_that("test-st_bbox_common", {
   l <- lapply(1:nrow(nc), function(x) nc[x, ])
 
   expect_equal(st_bbox_list(l), st_bbox(nc))
+
+  # with classes from terra pkg
+  rast <- rast(r)  # class SpatRaster
+  vect <- vect(sf) # class SpatVector
+  expect_equal(
+    st_bbox_common(r, sf),
+    st_bbox_common(rast, vect)
+  )
 })

@@ -29,6 +29,7 @@ Suggests:
     sp,
     stars,
     stats,
+    terra,
     testthat (>= 3.0.0),
     tmap
 URL: https://github.com/a-benini/sfhelpers, https://a-benini.github.io/sfhelpers/

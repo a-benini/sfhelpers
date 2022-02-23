@@ -1,3 +1,24 @@
+# sfhelpers 0.0.0.9001
+* fixed bug: `st_or()` and `st_erase_robust()` return expected geometries.
+* fixed bug: `st_or()` works with input layers having differently named geometry columns.
+* fixed bug: `st_or()` works with input layers being totally covered by the other one.
+* new argument `check_overlap` added to functions `st_or()` and `st_erase_robust()`.
+* redesign of argument `dim` and of internal handling of `GEOMETRYCOLLECTION` of
+function `st_or()` (s. examples of the function's help page).
+* enable passing arguments on to `s2::s2_options()` in functions `st_or()` and
+`st_erase_robust()`.
+* function `st_or()` accepts `sfg` as input.
+* include classes `SpatExtent`, `SpatRaster` and `SpatVector` from `terra`
+package as input options for functions `st_bbox_common()` and `st_bbox_list()`.
+* added `st_disaggregate()` function.
+* abandon `use_any_geometry` argument in function `st_rbindlist()`: The function
+can now handle `list`s of `sf`-objects having different `geometry_type`s without
+any need to specify this.
+* if the argument `geometry_name` is unspecified (default `NULL`), the function
+`st_rbindlist()` will always return a `sf` object with a geometry column
+inheriting its name from the 1st `sf` object listed in the input.
+* vignette `rbindlist_issues` updated.
+
 # sfhelpers 0.0.0.9000
 * 1st release on GitHub
 * 6 functions

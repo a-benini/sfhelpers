@@ -1,7 +1,7 @@
 #' \code{sf} equivalent of QGIS Union
 #'
-#' @param x object of class \code{sf} or \code{sfc}
-#' @param y object of class \code{sf} or \code{sfc}
+#' @param x object of class \code{sf}, \code{sfc} or \code{sfg}
+#' @param y object of class \code{sf}, \code{sfc} or \code{sfg}
 #' @param dim integer: A combination of 0, 1, and/or 2 (default) that constrains
 #' the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
 #' surfaces.
@@ -121,18 +121,12 @@
 #' )
 #' @export
 st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE, check_overlap = FALSE, ...) {
-  # if x or y are not of the class "sf" or "sfc" throw a corresponding error message
-  if (!any(c("sf", "sfc") %in% class(x))) {
-    stop(
-      paste0("the argument ", sQuote("x"), " must be of the class ", dQuote("sf"), " or ", dQuote("sfc")),
-      call. = TRUE
-    )
+  # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message
+  if (!inherits(x, c("sf", "sfc", "sfg"))) {
+    stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
   }
-  if (!any(c("sf", "sfc") %in% class(y))) {
-    stop(
-      paste0("the argument ", sQuote("y"), " must be of the class ", dQuote("sf"), " or ", dQuote("sfc")),
-      call. = TRUE
-    )
+  if (!inherits(y, c("sf", "sfc", "sfg"))) {
+    stop("the argument y must be of the class sf, sfc or sfg", call. = TRUE)
   }
 
   # if x and y don't have the same CRS, throw an error message
@@ -174,12 +168,12 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     stop("check_overlap must be a single logical value: TRUE or FALSE", call. = FALSE)
   }
 
-  # in case x or y are simple feature geometry list columns turn them into sf objects
-  if ("sfc" %in% class(x)) {
-    x <- sf::st_sf(geometry = x)
+  # in case x or y are ar of class sfc or sfg turn them into sf objects
+  if (!inherits(x, "sf")) {
+    x <- sf::st_sf(geometry = sf::st_geometry(x))
   }
-  if ("sfc" %in% class(y)) {
-    y <- sf::st_sf(geometry = y)
+  if (!inherits(y, "sf")) {
+    y <- sf::st_sf(geometry = sf::st_geometry(y))
   }
 
   # trigger warning independently from sf::st_intersection() and sfhelpers:::st_erase()
@@ -256,3 +250,4 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
 
   return(output)
 }
+

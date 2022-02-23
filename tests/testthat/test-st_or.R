@@ -1,13 +1,27 @@
 test_that("test-st_or", {
   library(sf)
 
-  expect_error(st_or(NA, poly_2))
-  expect_error(st_or(NULL, poly_2))
-  # the argument ‘x’ must be of the class “sf” or “sfc”
+  expect_error(st_or(NA, poly_2), "the argument x must be of the class sf, sfc or sfg")
+  expect_error(st_or(NULL, poly_2), "the argument x must be of the class sf, sfc or sfg")
 
-  expect_error(st_or(poly_1, NA))
-  expect_error(st_or(poly_1, NULL))
-  # the argument ‘y’ must be of the class “sf” or “sfc”
+  expect_error(st_or(poly_1, NA), "the argument y must be of the class sf, sfc or sfg")
+  expect_error(st_or(poly_1, NULL), "the argument y must be of the class sf, sfc or sfg")
+
+  sfg <- st_buffer(st_point(c(0, 0)), 1)
+  sfc <- st_make_grid(sfg * 2, n = 3)
+  sf  <- sfc %>% st_sf(id = seq_along(.), geometry = ., agr = "constant")
+  # plot(sfc, col = "gray")
+  # plot(sfg, add = TRUE, border = "red", lwd = 2)
+  # st_or(sf, sfg) %>% plot()
+  eq <- st_equals(
+    st_or(sf, sfg),
+    st_or(sfg, sf)
+  )
+  expect_true(all(seq_along(eq) == unlist(eq)))
+  expect_equal(
+    st_or(sf, sfg)[,-1], # without only attribute (id)
+    st_or(sfc, sfg)
+  )
 
   poly_1_epsg_21781 <- st_transform(poly_1, crs = 21781)
   expect_error(st_or(poly_1_epsg_21781, poly_2))
@@ -158,4 +172,3 @@ test_that("test-st_or", {
   diff <- sum(st_area(or)) - sum(st_area(or_check_overlap)) # 3.051758e-05 [m^2] -> not that much!
   expect_true(as.numeric(diff) < 3.1e-05)
 })
-

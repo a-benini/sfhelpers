@@ -16,9 +16,9 @@ st_or(
 )
 }
 \arguments{
-\item{x}{object of class \code{sf} or \code{sfc}}
+\item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 
-\item{y}{object of class \code{sf} or \code{sfc}}
+\item{y}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 
 \item{dim}{integer: A combination of 0, 1, and/or 2 (default) that constrains
 the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for

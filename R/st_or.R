@@ -33,12 +33,10 @@
 #'   corresponding to the geometry set they originated from (s. below examples)
 #' }
 #'
-#' @importFrom sf st_crs st_sf st_agr st_combine st_union st_make_valid
-#' st_difference st_dimension st_intersection
+#' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection
 #'
 #' @examples
 #' library(sf)
-#' library(magrittr)
 #'
 #' st_or(poly_1, poly_2) %>% plot()
 #'
@@ -131,11 +129,8 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     names(y) <- ifelse(y_names %in% x_agr, paste0(y_names, y.suffix), y_names)
   }
 
-  # st_erase to get the remainder of the intersection
-  # (improved version of code found under ?st_difference)
-  st_erase <- function(x, y) {
-    sf::st_difference(x, sf::st_make_valid(sf::st_union(sf::st_combine(y))))
-  }
+  # to get the remainder of the intersection sfhelpers:::st_erase()* is used (s. below) instead of the formerly here coded st_erase()
+  # (*improved version of st_erase() found under ?st_difference)
 
   # we need st_dump to extract polygons from a potential GEOMETRYCOLLECTION
   st_dump <- function(x, dim) {

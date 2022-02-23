@@ -51,7 +51,6 @@ corresponding to the geometry set they originated from (s. below examples)
 }
 \examples{
 library(sf)
-library(magrittr)
 
 st_or(poly_1, poly_2) \%>\% plot()
 

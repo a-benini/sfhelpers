@@ -11,7 +11,8 @@ st_or(
   x.suffix = ".x",
   y.suffix = ".y",
   suffix.all = FALSE,
-  check_overlap = FALSE
+  check_overlap = FALSE,
+  ...
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ headings.}
 \code{x} and \code{y} which overlap with the other input layer and applies
 geometric operations only on these; \code{FALSE} (default) applies geometric
 operations on all geometries (s. Details).}
+
+\item{...}{arguments passed on to \code{\link[s2]{s2_options}}}
 }
 \value{
 geometry set containing the intersection of \code{x} and \code{y} and

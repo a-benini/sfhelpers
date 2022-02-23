@@ -17,6 +17,7 @@
 #' \code{x} and \code{y} which overlap with the other input layer and applies
 #' geometric operations only on these; \code{FALSE} (default) applies geometric
 #' operations on all geometries (s. Details).
+#' @param ... arguments passed on to \code{\link[s2]{s2_options}}
 #'
 #' @return geometry set containing the intersection of \code{x} and \code{y} and
 #' the non-overlapping parts of \code{x} and \code{y}. The attribute table is
@@ -119,7 +120,7 @@
 #'   st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
 #' )
 #' @export
-st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE, check_overlap = FALSE) {
+st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE, check_overlap = FALSE, ...) {
   # if x or y are not of the class "sf" or "sfc" throw a corresponding error message
   if (!any(c("sf", "sfc") %in% class(x))) {
     stop(
@@ -208,7 +209,7 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
   # (*improved version of st_erase() found under ?st_difference)
 
   if(check_overlap){ # separate intersecting and non-intersecting geometries
-    int      <- sf::st_intersects(x, y)
+    int      <- sf::st_intersects(x, y, ...)
     int_x    <- lengths(int) > 0
     int_y    <- seq_len(nrow(y)) %in% unique(unlist(int))
     x_no_int <- x[!int_x, ]
@@ -221,11 +222,11 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
   }
 
   # get overlap via intersection
-  overlap <- sf::st_intersection(x, y)
+  overlap <- sf::st_intersection(x, y, ...)
 
   # get the non-intersecting parts with sfhelpers:::st_erase()
-  x_diff <- st_erase(x, y)
-  y_diff <- st_erase(y, x)
+  x_diff <- st_erase(x, y, ...)
+  y_diff <- st_erase(y, x, ...)
 
   # stack the intersecting and non-intersecting parts and set missing attributes to NA
   l                <- list(overlap, x_diff, y_diff, x_no_int, y_no_int)

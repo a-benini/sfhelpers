@@ -59,4 +59,9 @@ test_that("test-st_or", {
   x_names_suffixed   <- poly_1 %>% st_drop_geometry() %>% names() %>% paste0(".x")
   y_names_suffixed   <- poly_2 %>% st_drop_geometry() %>% names() %>% paste0(".y")
   expect_equal(all_names_suffixed, c(x_names_suffixed, y_names_suffixed))
+
+  # total overlap of input layer x by input layer y ...
+  expect_equal(nrow(st_erase_robust(poly_1[1, ], poly_2)), 0) # check total overlap
+  # ... doesn't work with current pkg version (0.0.0.9000)
+  expect_error(st_or(poly_1[1, ], poly_2))
 })

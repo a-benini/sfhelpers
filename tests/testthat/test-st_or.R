@@ -13,13 +13,13 @@ test_that("test-st_or", {
   expect_error(st_or(poly_1_epsg_21781, poly_2))
   # "sf::st_crs(x) == sf::st_crs(y) is not TRUE"
 
-  expect_error(st_or(poly_1, poly_2, dim = 3), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = 0:2), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = NA_integer_), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = TRUE), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = matrix(1)), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = list(1)), "dim must be a single integer: 0, 1 or 2")
-  expect_error(st_or(poly_1, poly_2, dim = factor(1)), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = 3), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = 0:3), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = NA_integer_), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = TRUE), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = matrix(1)), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = list(1)), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
+  expect_error(st_or(poly_1, poly_2, dim = factor(1)), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
 
   expect_error(st_or(poly_1, poly_2, x.suffix = "same_name", y.suffix = "same_name"))
   # The arguments ‘x.suffix’ and ‘y.suffix’ are specified both with "same_name". But they need to be specified differently.
@@ -88,4 +88,40 @@ test_that("test-st_or", {
     attr(st_or(x = poly_1_renamed_geom, y = poly_2), "sf_column") # st_or(x = x, y = y)
   )
   # * behavior as sf::st_intersection()
+
+  # create two layers with overlapping linestrings:
+  ls1 <- st_linestring(cbind(c(0, 1, 1, 0), c(0:3)))
+  ls2 <- st_linestring(cbind(c(2, 1, 1), c(0, 0, 3)))
+  ls3 <- st_linestring(cbind(c(0, 0.5, 0.5, 0), c(0, 0, 2.5, 2)))
+  A <- st_sf(id_A = 1, A = "A", geom = st_sfc(ls1), agr = "constant")
+  B <- st_sf(id_B = 1:2, B = "B", geom = st_sfc(ls2, ls3), agr = "constant")
+
+  # if both input layers consisting of linestings using the default specification ...
+  # ... dim = 2 (for surfaces / (multi)polygons) will return a sf-object with zero rows
+  expect_equal(
+    nrow(st_or(A, B)),
+    0
+  )
+
+  # to get lines returned set dim = 1:
+  expect_true(
+    all(
+      st_or(A, B, dim = 1) %>% st_dimension() == 1
+    )
+  )
+
+  # when both input layers consists of linestings, and if the default specification ...
+  # ... dim = 2 (for surfaces / (multi)polygons) is used, a sf-object with zero ...
+  # ... rows will be returned:
+  expect_true(
+    all(
+      st_or(A, B, dim = c(0, 1)) %>% st_dimension() %in% c(0, 1)
+    )
+  )
+
+  expect_equal(
+    st_or(A, B, dim = c(0, 1)), # returns points & lines
+    st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
+  )
 })
+

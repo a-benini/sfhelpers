@@ -2,10 +2,12 @@
 #'
 #' @param x object of class \code{sf} or \code{sfc}
 #' @param y object of class \code{sf} or \code{sfc}
-#' @param dim integer 0, 1, or 2 (default) for dimension of simple feature
-#' @param x.suffix a single character strings (default \code{".x"}) attached as
+#' @param dim integer: A combination of 0, 1, and/or 2 (default) that constrains
+#' the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
+#' surfaces.
+#' @param x.suffix a single character string (default \code{".x"}) attached as
 #' suffix to attribute headings inherited from argument \code{x}
-#' @param y.suffix a single character strings (default \code{".y"}) attached as
+#' @param y.suffix a single character string (default \code{".y"}) attached as
 #' suffix to attribute headings inherited from argument \code{y}
 #' @param suffix.all \code{TRUE} suffixes all attribute headings inherited from
 #' arguments \code{x} and \code{y} according to \code{x.suffix}, resp.
@@ -16,7 +18,8 @@
 #' the non-overlapping parts of \code{x} and \code{y}. The attribute table is
 #' filled with attribute values from the respective original geometry set for
 #' non-overlapping features, and attribute values from both geometry sets for
-#' overlapping features.
+#' overlapping features. The dimension(s) of the returned geometries is/are
+#' determined with the argument \code{dim}.
 #'
 #' @details
 #' \code{st_or()} consists at its core of code presented by
@@ -35,10 +38,11 @@
 #'
 #' @importFrom data.table as.data.table rbindlist
 #' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection st_geometry
-#' st_drop_geometry
+#' st_drop_geometry st_is st_sfc
 #' @importFrom uuid UUIDgenerate
 #'
 #' @examples
+#' library(dplyr)
 #' library(sf)
 #'
 #' st_or(poly_1, poly_2) %>% plot()
@@ -50,14 +54,14 @@
 #' st_agr(poly_1) <- "constant"
 #' st_agr(poly_2) <- "constant"
 #'
-#' # Give customized suffixes to homonymous attributes of layer x and y:
+#' # Give customized suffixes to homonymous attributes of layers x and y:
 #' st_or(poly_1, poly_2, x.suffix = "_poly_1", y.suffix = "_poly_2") %>% plot()
 #'
 #' # If only homonymous attributes from one layer should get a suffix, set ...
 #' # ... the suffix for the other layer to an empty string:
 #' st_or(poly_1, poly_2, x.suffix = "") %>% names()
 #'
-#' # If all attributes attributes of both layer x and y should get a
+#' # If all attributes attributes of both layers x and y should get a
 #' # ... layer-specific suffix, set suffix.all = TRUE:
 #' st_or(poly_1, poly_2, suffix.all = TRUE) %>% names()
 #'
@@ -65,6 +69,37 @@
 #' # ... for the other layer to an empty string and set suffix.all = TRUE:
 #' st_or(poly_1, poly_2, x.suffix = "", suffix.all = TRUE) %>% names()
 #'
+#' # create two layers with overlapping linestrings:
+#' ls1 <- st_linestring(cbind(c(0, 1, 1, 0), c(0:3)))
+#' ls2 <- st_linestring(cbind(c(2, 1, 1), c(0, 0, 3)))
+#' ls3 <- st_linestring(cbind(c(0, 0.5, 0.5, 0), c(0, 0, 2.5, 2)))
+#' A <- st_sf(id_A = 1, A = "A", geom = st_sfc(ls1), agr = "constant")
+#' B <- st_sf(id_B = 1:2, B = "B", geom = st_sfc(ls2, ls3), agr = "constant")
+#'
+#' plot(st_geometry(A), col = "gray", lwd = 4, extent = st_bbox_common(A, B))
+#' plot(st_geometry(B), col = "red", lty = 2, add = TRUE)
+#' legend("right", legend = c("A", "B"), col = c("gray", "red"), lwd = c(4, 1), lty = c(1, 2))
+#'
+#' # when both input layers consist of linestings, and if the default specification ...
+#' # ... dim = 2 (for surfaces / (multi)polygons) is used, a sf-object with zero ...
+#' # ... rows will be returned:
+#' st_or(A, B)
+#'
+#' # to get lines returned set dim = 1:
+#' comb_dim_1 <- st_or(A, B, dim = 1) %>%
+#'   mutate(comb = ifelse(is.na(A), "B", ifelse(is.na(B), "A", "A+B")))
+#' plot(comb_dim_1[, "comb"], lwd = 3, key.pos = 1, main = "dim = 1: only lines")
+#'
+#' # for returning lines and points where lines cross or touch lines of the other ...
+#' # ... input layer, set dim = c(0, 1):
+#' comb_dim_0_1 <- st_or(A, B, dim = c(0, 1)) %>%
+#'   mutate(comb = ifelse(is.na(A), "B", ifelse(is.na(B), "A", "A+B")))
+#' plot(comb_dim_0_1[, "comb"], lwd = 3, cex = 2, key.pos = 1, main = "dim = c(0, 1): points & lines")
+#'
+#' all.equal(
+#'   st_or(A, B, dim = c(0, 1)), # returns points & lines
+#'   st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
+#' )
 #' @export
 st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE) {
   # if x or y are not of the class "sf" or "sfc" throw a corresponding error message
@@ -86,9 +121,9 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     stop("sf::st_crs(x) == sf::st_crs(y) is not TRUE", call. = TRUE)
   }
 
-  # check if dim = 0, 1 or 2 (default)
-  if(!is.vector(dim) | !is.numeric(dim) | length(dim) != 1 | isTRUE(!dim %in% c(0, 1, 2))){
-    stop("dim must be a single integer: 0, 1 or 2", call. = FALSE)
+  # check if dim = 0, 1 and/or 2 (default)
+  if(!is.vector(dim) | !is.numeric(dim) | any(!dim %in% c(0, 1, 2))){
+    stop("dim must be a single integer or vector of integers consisting of 0, 1 and/or 2", call. = FALSE)
   }
 
   # check if x.suffix and y.suffix are single character strings
@@ -150,26 +185,8 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
   # to get the remainder of the intersection sfhelpers:::st_erase()* is used (s. below) instead of the formerly here coded st_erase()
   # (*improved version of st_erase() found under ?st_difference)
 
-  # we need st_dump to extract polygons from a potential GEOMETRYCOLLECTION
-  st_dump <- function(x, dim) {
-    dims <- sapply(x, sf::st_dimension)
-    x[dims == dim, ]
-  }
-
   # get overlap via intersection
   overlap <- sf::st_intersection(x, y)
-
-  # extract polygons (if dimm = 2)
-  overlap <- overlap[sf::st_dimension(overlap) == dim, ]
-
-  gc <- which(sapply(seq(nrow(overlap)), function(i) {
-    inherits(overlap[i, ], "GEOMETRYCOLLECTION")
-  }))
-
-  if (length(gc) > 0) {
-    dmp <- st_dump(overlap, dim = dim)
-    overlap <- rbind(overlap[-gc, ], dmp)
-  }
 
   # get the non-intersecting parts with sfhelpers:::st_erase()
   x_diff <- st_erase(x, y)
@@ -182,7 +199,20 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
   get_non_geometry <- function(x) { data.table::as.data.table(sf::st_drop_geometry(x), keep.rownames = tmp_col) }
   non_geometry     <- data.table::rbindlist(lapply(l, get_non_geometry), use.names = TRUE, fill = TRUE)
   output           <- sf::st_sf(non_geometry, geometry)
-  output           <- output[, names(output) != tmp_col]
+
+  # geometry collections included in output?
+  is_gc <- sf::st_is(output, "GEOMETRYCOLLECTION")
+  if (any(is_gc)) { # if so disaggregate these into sub-geometries
+    output_gc    <- output[is_gc, ]
+    l_sfg        <- lapply(sf::st_geometry(output_gc), `[`)
+    geometry     <- do.call(c, lapply(l_sfg, sf::st_sfc, crs = sf::st_crs(output)))
+    rep_row      <- rep(seq_len(nrow(output_gc)), lengths(l_sfg))
+    non_geometry <- sf::st_drop_geometry(output_gc)[rep_row, , drop = FALSE]
+    output       <- rbind(output[!is_gc, ], sf::st_sf(non_geometry, geometry))
+  }
+
+  # filter output by desired dimension(s) and remove tmp. col
+  output <- output[sf::st_dimension(output) %in% unique(dim), names(output) != tmp_col]
 
   # name of geometry column is inherited from input layer x*
   # *same behavior as sf::st_intersection():

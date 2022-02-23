@@ -11,12 +11,14 @@ st_or(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE)
 
 \item{y}{object of class \code{sf} or \code{sfc}}
 
-\item{dim}{integer 0, 1, or 2 (default) for dimension of simple feature}
+\item{dim}{integer: A combination of 0, 1, and/or 2 (default) that constrains
+the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
+surfaces.}
 
-\item{x.suffix}{a single character strings (default \code{".x"}) attached as
+\item{x.suffix}{a single character string (default \code{".x"}) attached as
 suffix to attribute headings inherited from argument \code{x}}
 
-\item{y.suffix}{a single character strings (default \code{".y"}) attached as
+\item{y.suffix}{a single character string (default \code{".y"}) attached as
 suffix to attribute headings inherited from argument \code{y}}
 
 \item{suffix.all}{\code{TRUE} suffixes all attribute headings inherited from
@@ -29,7 +31,8 @@ geometry set containing the intersection of \code{x} and \code{y} and
 the non-overlapping parts of \code{x} and \code{y}. The attribute table is
 filled with attribute values from the respective original geometry set for
 non-overlapping features, and attribute values from both geometry sets for
-overlapping features.
+overlapping features. The dimension(s) of the returned geometries is/are
+determined with the argument \code{dim}.
 }
 \description{
 \code{sf} equivalent of QGIS Union
@@ -50,6 +53,7 @@ and/or being totally overlapped by the other input layer.
 }
 }
 \examples{
+library(dplyr)
 library(sf)
 
 st_or(poly_1, poly_2) \%>\% plot()
@@ -61,14 +65,14 @@ st_or(poly_1, poly_2) \%>\% st_drop_geometry()
 st_agr(poly_1) <- "constant"
 st_agr(poly_2) <- "constant"
 
-# Give customized suffixes to homonymous attributes of layer x and y:
+# Give customized suffixes to homonymous attributes of layers x and y:
 st_or(poly_1, poly_2, x.suffix = "_poly_1", y.suffix = "_poly_2") \%>\% plot()
 
 # If only homonymous attributes from one layer should get a suffix, set ...
 # ... the suffix for the other layer to an empty string:
 st_or(poly_1, poly_2, x.suffix = "") \%>\% names()
 
-# If all attributes attributes of both layer x and y should get a
+# If all attributes attributes of both layers x and y should get a
 # ... layer-specific suffix, set suffix.all = TRUE:
 st_or(poly_1, poly_2, suffix.all = TRUE) \%>\% names()
 
@@ -76,4 +80,35 @@ st_or(poly_1, poly_2, suffix.all = TRUE) \%>\% names()
 # ... for the other layer to an empty string and set suffix.all = TRUE:
 st_or(poly_1, poly_2, x.suffix = "", suffix.all = TRUE) \%>\% names()
 
+# create two layers with overlapping linestrings:
+ls1 <- st_linestring(cbind(c(0, 1, 1, 0), c(0:3)))
+ls2 <- st_linestring(cbind(c(2, 1, 1), c(0, 0, 3)))
+ls3 <- st_linestring(cbind(c(0, 0.5, 0.5, 0), c(0, 0, 2.5, 2)))
+A <- st_sf(id_A = 1, A = "A", geom = st_sfc(ls1), agr = "constant")
+B <- st_sf(id_B = 1:2, B = "B", geom = st_sfc(ls2, ls3), agr = "constant")
+
+plot(st_geometry(A), col = "gray", lwd = 4, extent = st_bbox_common(A, B))
+plot(st_geometry(B), col = "red", lty = 2, add = TRUE)
+legend("right", legend = c("A", "B"), col = c("gray", "red"), lwd = c(4, 1), lty = c(1, 2))
+
+# when both input layers consist of linestings, and if the default specification ...
+# ... dim = 2 (for surfaces / (multi)polygons) is used, a sf-object with zero ...
+# ... rows will be returned:
+st_or(A, B)
+
+# to get lines returned set dim = 1:
+comb_dim_1 <- st_or(A, B, dim = 1) \%>\%
+  mutate(comb = ifelse(is.na(A), "B", ifelse(is.na(B), "A", "A+B")))
+plot(comb_dim_1[, "comb"], lwd = 3, key.pos = 1, main = "dim = 1: only lines")
+
+# for returning lines and points where lines cross or touch lines of the other ...
+# ... input layer, set dim = c(0, 1):
+comb_dim_0_1 <- st_or(A, B, dim = c(0, 1)) \%>\%
+  mutate(comb = ifelse(is.na(A), "B", ifelse(is.na(B), "A", "A+B")))
+plot(comb_dim_0_1[, "comb"], lwd = 3, cex = 2, key.pos = 1, main = "dim = c(0, 1): points & lines")
+
+all.equal(
+  st_or(A, B, dim = c(0, 1)), # returns points & lines
+  st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
+)
 }

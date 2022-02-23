@@ -24,7 +24,6 @@ Imports:
 Suggests: 
     dplyr,
     knitr,
-    magrittr,
     raster,
     rmarkdown,
     sp,

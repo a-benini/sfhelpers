@@ -4,7 +4,15 @@
 \alias{st_or}
 \title{\code{sf} equivalent of QGIS Union}
 \usage{
-st_or(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE)
+st_or(
+  x,
+  y,
+  dim = 2,
+  x.suffix = ".x",
+  y.suffix = ".y",
+  suffix.all = FALSE,
+  check_overlap = FALSE
+)
 }
 \arguments{
 \item{x}{object of class \code{sf} or \code{sfc}}
@@ -25,6 +33,11 @@ suffix to attribute headings inherited from argument \code{y}}
 arguments \code{x} and \code{y} according to \code{x.suffix}, resp.
 \code{y.suffix}; \code{FALSE} (default) suffixes only homonymous attribute
 headings.}
+
+\item{check_overlap}{\code{TRUE} detects those geometries included in
+\code{x} and \code{y} which overlap with the other input layer and applies
+geometric operations only on these; \code{FALSE} (default) applies geometric
+operations on all geometries (s. Details).}
 }
 \value{
 geometry set containing the intersection of \code{x} and \code{y} and
@@ -50,6 +63,20 @@ geometry sets (s. below examples)
 corresponding to the geometry set they originated from (s. below examples)
 \item handling of input layers with differently named geometry columns
 and/or being totally overlapped by the other input layer.
+\item optional restriction of the geometric operations to geometries of the
+input layers \code{x} and \code{y} overlapping those of the other input
+layer (argument \code{check_overlap = TRUE}). In case of a significant
+proportion of non-overlapping geometries, this can shorten run time. As the
+internal distinction of overlapping and non-overlapping geometries relies
+on \code{\link[sf]{st_intersects}}, which itself is time consuming, setting
+\code{check_overlap} to \code{TRUE} involves a trade off: If all geometries
+overlap, \code{check_overlap = TRUE} will only increase the run time. On
+the other hand, the higher the proportion of non-overlapping geometries,
+the more this argument specification shortens the processing time by
+leaving out unnecessary geometric operations. Ideally the user has previous
+knowledge about how little or how much the input layers \code{x} and
+\code{y} overlap with each other in order to apply \code{check_overlap} in
+a informed way.
 }
 }
 \examples{

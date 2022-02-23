@@ -62,15 +62,22 @@ test_that("test-st_or", {
 
   # total overlap of input layer x by input layer y ...
   expect_equal(nrow(st_erase_robust(poly_1[1, ], poly_2)), 0) # check total overlap
-  # ... doesn't work with current pkg version (0.0.0.9000)
-  expect_error(st_or(poly_1[1, ], poly_2))
+  expect_equal(
+    st_bbox(st_or(poly_1[1, ], poly_2)), # ... works with pkg version >= 0.0.0.9001
+    st_bbox(poly_2)
+  )
 
   # poly_1 and poly_2 have identically named geometry columns:
   expect_equal(attr(poly_1, "sf_column"), attr(poly_2, "sf_column"))
   # create a version of poly_1 with differently named geometry column:
   poly_1_renamed_geom <- st_rename_geometry(poly_1, "renamed_geometry")
   expect_false(attr(poly_1_renamed_geom, "sf_column") == attr(poly_2, "sf_column"))
-  # input layers x and y with differently named geometry columns doesn't work
-  # with current pkg version (0.0.0.9000):
-  expect_error(st_or(poly_1_renamed_geom, poly_2))
+  # input layers x and y with differently named geometry columns works with pkg
+  # version >= 0.0.0.9001 and the name the output's geometry column is inherited
+  # from input layer x*:
+  expect_equal(
+    attr(poly_1_renamed_geom, "sf_column"),                       # input layer x
+    attr(st_or(x = poly_1_renamed_geom, y = poly_2), "sf_column") # st_or(x = x, y = y)
+  )
+  # * behavior as sf::st_intersection()
 })

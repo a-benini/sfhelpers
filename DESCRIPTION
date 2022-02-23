@@ -18,7 +18,8 @@ Depends:
 Imports: 
     data.table,
     sf,
-    tmaptools
+    tmaptools,
+    uuid
 Suggests: 
     dplyr,
     knitr,

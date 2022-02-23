@@ -19,21 +19,24 @@
 #' overlapping features.
 #'
 #' @details
-#' \code{st_or()} consists mainly of code presented by
+#' \code{st_or()} consists at its core of code presented by
 #' \href{https://gis.stackexchange.com/questions/251440/ogr2ogr-equivalent-of-qgis-union/251575#251575}{TimSalbim on gis.stackexchange}
-#' and some improvements put out by
-#' \href{https://atriplex.info/blog/index.php/2018/07/12/full-spatial-polygon-union-intersection-with-r-sf/}{Jimbob on his blog}.
-#' In addition to these two precursors this version of \code{st_or()} includes:
+#' . In addition to its precursor this version of \code{st_or()} includes:
 #' \itemize{
 #'   \item a more robust version of the internal function \code{st_erase()}
 #'   equivalent to \code{\link{st_erase_robust}}
 #'   \item the ability to handle homonymous attribute variables of both input
 #'   geometry sets (s. below examples)
-#'   \item the possibly to give customized suffixes to attribute variables
+#'   \item the possibility to give customized suffixes to attribute variables
 #'   corresponding to the geometry set they originated from (s. below examples)
+#'   \item handling of input layers with differently named geometry columns
+#'   and/or being totally overlapped by the other input layer.
 #' }
 #'
-#' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection
+#' @importFrom data.table as.data.table rbindlist
+#' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection st_geometry
+#' st_drop_geometry
+#' @importFrom uuid UUIDgenerate
 #'
 #' @examples
 #' library(sf)
@@ -162,17 +165,22 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
   sf::st_agr(x) <- "constant"
   sf::st_agr(y) <- "constant"
 
-  # get the non-intersecting parts and set missing attributes to NA
-  #### I have modified this to the erasure and insertion of NA
-  #### values before the rbind to ensure they have the same columns
-  diff1 <- st_erase(x, y)
-  diff2 <- st_erase(y, x)
+  # get the non-intersecting parts with sfhelpers:::st_erase()
+  x_diff <- st_erase(x, y)
+  y_diff <- st_erase(y, x)
 
-  diff1[, setdiff(names(overlap), names(diff1))] <- NA
-  diff2[, setdiff(names(overlap), names(diff2))] <- NA
+  # stack the intersecting and non-intersecting parts and set missing attributes to NA
+  l                <- list(overlap, x_diff, y_diff)
+  geometry         <- do.call(c, lapply(l, sf::st_geometry))
+  tmp_col          <- uuid::UUIDgenerate()
+  get_non_geometry <- function(x) { data.table::as.data.table(sf::st_drop_geometry(x), keep.rownames = tmp_col) }
+  non_geometry     <- data.table::rbindlist(lapply(l, get_non_geometry), use.names = TRUE, fill = TRUE)
+  output           <- sf::st_sf(non_geometry, geometry)
+  output           <- output[, names(output) != tmp_col]
 
-  cb <- rbind(diff1, diff2)
+  # name of geometry column is inherited from input layer x*
+  # *same behavior as sf::st_intersection():
+  output <- st_rename_geom(output, attr(x, "sf_column"))
 
-  # return combined geometry set with attributes
-  return(rbind(overlap, cb))
+  return(output)
 }

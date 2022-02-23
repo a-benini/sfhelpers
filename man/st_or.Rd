@@ -35,18 +35,18 @@ overlapping features.
 \code{sf} equivalent of QGIS Union
 }
 \details{
-\code{st_or()} consists mainly of code presented by
+\code{st_or()} consists at its core of code presented by
 \href{https://gis.stackexchange.com/questions/251440/ogr2ogr-equivalent-of-qgis-union/251575#251575}{TimSalbim on gis.stackexchange}
-and some improvements put out by
-\href{https://atriplex.info/blog/index.php/2018/07/12/full-spatial-polygon-union-intersection-with-r-sf/}{Jimbob on his blog}.
-In addition to these two precursors this version of \code{st_or()} includes:
+. In addition to its precursor this version of \code{st_or()} includes:
 \itemize{
 \item a more robust version of the internal function \code{st_erase()}
 equivalent to \code{\link{st_erase_robust}}
 \item the ability to handle homonymous attribute variables of both input
 geometry sets (s. below examples)
-\item the possibly to give customized suffixes to attribute variables
+\item the possibility to give customized suffixes to attribute variables
 corresponding to the geometry set they originated from (s. below examples)
+\item handling of input layers with differently named geometry columns
+and/or being totally overlapped by the other input layer.
 }
 }
 \examples{

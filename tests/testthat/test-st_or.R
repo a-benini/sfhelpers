@@ -13,6 +13,14 @@ test_that("test-st_or", {
   expect_error(st_or(poly_1_epsg_21781, poly_2))
   # "sf::st_crs(x) == sf::st_crs(y) is not TRUE"
 
+  expect_error(st_or(poly_1, poly_2, dim = 3), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = 0:2), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = NA_integer_), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = TRUE), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = matrix(1)), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = list(1)), "dim must be a single integer: 0, 1 or 2")
+  expect_error(st_or(poly_1, poly_2, dim = factor(1)), "dim must be a single integer: 0, 1 or 2")
+
   expect_error(st_or(poly_1, poly_2, x.suffix = "same_name", y.suffix = "same_name"))
   # The arguments ‘x.suffix’ and ‘y.suffix’ are specified both with "same_name". But they need to be specified differently.
 

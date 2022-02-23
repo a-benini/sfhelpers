@@ -86,6 +86,11 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     stop("sf::st_crs(x) == sf::st_crs(y) is not TRUE", call. = TRUE)
   }
 
+  # check if dim = 0, 1 or 2 (default)
+  if(!is.vector(dim) | !is.numeric(dim) | length(dim) != 1 | isTRUE(!dim %in% c(0, 1, 2))){
+    stop("dim must be a single integer: 0, 1 or 2", call. = FALSE)
+  }
+
   # check if x.suffix and y.suffix are single character strings
   if (!(is.character(x.suffix) & length(x.suffix) == 1)) {
     stop("the argument x.suffix must be a single character string", call. = FALSE)

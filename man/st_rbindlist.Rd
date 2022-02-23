@@ -4,13 +4,7 @@
 \alias{st_rbindlist}
 \title{Convert a list of sf objects to a single sf object}
 \usage{
-st_rbindlist(
-  l,
-  ...,
-  use_geometry = FALSE,
-  use_any_geometry = FALSE,
-  geometry_name = NULL
-)
+st_rbindlist(l, ..., use_geometry = FALSE, geometry_name = NULL)
 }
 \arguments{
 \item{l}{\code{list} of objects of the class \code{sf}}
@@ -19,14 +13,9 @@ st_rbindlist(
 except \code{l}}
 
 \item{use_geometry}{\code{TRUE} detects and binds the active list-columns
-with simple feature geometries separately if all of them have the same
-geometry type, thus enabling matching of geometry columns differing by
-name as well as by position across the \code{list}ed sf objects.}
-
-\item{use_any_geometry}{\code{TRUE} does the same as
-\code{use_geometry = TRUE}, but allows different geometry types among the
-\code{list}ed sf objects. If \code{use_any_geometry = TRUE} then
-\code{use_geometry} is ignored.}
+with simple feature geometries separately, thus enabling matching of geometry
+columns differing by name as well as by position across the \code{list}ed sf
+objects.}
 
 \item{geometry_name}{a single character string giving a user-defined name to
 the returned active list-column with simple feature geometries.}
@@ -48,39 +37,34 @@ CRS
 \item returns a \code{sf} object with a correct \code{bbox} (more
 information on how to handle this \code{rbindlist} issue can be found
 \href{https://github.com/Rdatatable/data.table/issues/4681}{here}).
-\item allows binding \code{sf} objects with different geometry types, which
-can be achieved by setting \code{st_rbindlist}'s argument
-\code{use_any_geometry} to \code{TRUE}.
+\item allows binding \code{sf} objects with different geometry types
 }
 Remarks about matching geometry columns of input \code{sf} objects:
 \itemize{
 \item If the geometry columns are identically named, but differ by position
 within
-each \code{sf} object set \code{use.names = TRUE} and \code{fill = TRUE}.
+each \code{sf} object, set \code{use.names = TRUE} and \code{fill = TRUE}.
 \item If the geometry (and other) columns are differently named, but have
-same position within every \code{sf} object set \code{use.names = FALSE}.
+same position within every \code{sf} object, set \code{use.names = FALSE}.
 \item If the geometry columns are differently named and at the same time
-differently positioned set \code{use_geometry = TRUE} or
-\code{use_any_geometry = TRUE}. This detects the geometry columns and
-then matches them separately while the other columns can be still treated
-collectively by the arguments \code{use.names} and \code{fill}. Note that
-matching geometry columns separately requires more processing time.
+differently positioned, set \code{use_geometry = TRUE}. This detects the
+geometry columns and then matches them separately while the other columns
+can still be treated collectively by the arguments \code{use.names} and
+\code{fill}. Note that matching geometry columns separately requires more
+processing time.
 }
-If the argument \code{geometry_name} is unspecified (default \code{NULL})
+If the argument \code{geometry_name} is unspecified (default \code{NULL}),
 the geometry column name of the returned \code{sf} object depends on the
 following:
 \itemize{
-\item If separately matched geometry columns (\code{use_geometry = TRUE} or
-\code{use_any_geometry = TRUE}) have a common name, this name persists,
-else \code{"geometry"} is used.
+\item If separately matched geometry columns (\code{use_geometry = TRUE})
+have a common name, this name persists, else \code{"geometry"} is used.
 \item If geometry (and other) columns are differently named and matched by
 their same position (\code{use.names = FALSE}), the geometry column name
 is inherited from the first \code{sf} object \code{list}ed in the input.
 }
 }
 \examples{
-library(magrittr)
-library(dplyr)
 library(sf)
 
 # a set of geometries to work with
@@ -103,7 +87,7 @@ list_of_sf <- lapply(
 nc_new_2 <- st_rbindlist(list_of_sf, use.name = FALSE)
 # ... but by default the name of the returned geometry column ...
 attr(nc_new_2, "sf_column")
-# ... is inherited from the first listed sf-object.
+# ... is inherited from the first listed sf-object:
 attr(nc_new_2, "sf_column") == attr(list_of_sf[[1]], "sf_column")
 # user defined name of the stacked geometry column:
 nc_new_3 <- st_rbindlist(list_of_sf, use.name = FALSE, geometry_name = "geom")
@@ -117,7 +101,7 @@ st_rbindlist(l, idcol = "ID")
 # geometry and attribute columns (the latter might not be included in
 # each listed sf-object) ...
 l <- list(nc[1, NULL], nc[2, 1], nc[3, 2:3])
-# ... requires use.name = TRUE and fill = TRUE
+# ... requires use.name = TRUE and fill = TRUE:
 st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE)
 
 # list of sf-objects with differently named and positioned geometry columns,
@@ -127,33 +111,10 @@ l <- lapply(
   function(x) st_rename_geometry(l[[x]], paste0("geom_", x))
   )
 sapply(l, attr, "sf_column") # geometry column names of listed sf-objects
+
 # ... requires use_geometry = TRUE for detecting and binding the geometry
-# columns (separately from the attribute columns)
+# columns (separately from the attribute columns):
 st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE)
-
-# list of sf-objects having different geometry types,
-#  all columns identically named and positioned ...
-l <- list(
-  multi_poly = nc[1:2, ],
-  no_row     = nc[NULL, ],
-  poly       = st_cast(nc[4, ], "POLYGON", warn = FALSE),
-  empty_row  = nc[nrow(nc) + 1, ]
-  )
-sapply(l, st_geometry_type, by_geometry = FALSE)
-# ... requires use_any_geometry = TRUE
-st_obj <- st_rbindlist(l, idcol = TRUE, use_any_geometry = TRUE)
-st_obj[, ".id"] \%>\% mutate(geometry_type = st_geometry_type(.))
-
-# list of sf-objects having different geometry types as well as having
-# differently named and positioned geometry columns, and (if existing)
-# identically named attribute columns ...
-l <- lapply(
-  seq_along(l),
-  function(x) {st_rename_geometry(l[[x]], paste0("geom_", x)) \%>\% .[,1:x]}
-  ) \%>\%
-  setNames(names(l))
-# ... requires use.name, fill and use_any_geometry all being set to TRUE
-st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_any_geometry = TRUE)
 }
 \seealso{
 \href{../doc/rbindlist_issues.html}{\code{vignette("rbindlist_issues")}}

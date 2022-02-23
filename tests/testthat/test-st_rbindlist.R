@@ -22,16 +22,6 @@ test_that("test-st_rbindlist", {
   )
 
   expect_error(
-    st_rbindlist(list_of_sf, use_any_geometry = NULL),
-    "use_any_geometry must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_rbindlist(list_of_sf, use_any_geometry = "true"),
-    "use_any_geometry must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
     st_rbindlist(list_of_sf, geometry_name = factor("new_geometry_name")),
     "geometry_name must be either NULL or a single character string"
   )
@@ -86,29 +76,18 @@ test_that("test-st_rbindlist", {
 
   expect_true(n_geom_type > 1)
 
-  expect_error(st_rbindlist(l_different_geometry_types))
-
-  # expect_equal(
-  #  st_rbindlist(l_different_geometry_types, use_any_geometry = TRUE),
-  #  do.call(rbind, l_different_geometry_types)
-  # )
+  sf_helpers <- st_rbindlist(l_different_geometry_types)
+  do_call    <- do.call(rbind, l_different_geometry_types)
+  row.names(sf_helpers) <- row.names(do_call)
+  expect_equal(sf_helpers, do_call)
 
   l <- list(nc[1:3, ], NULL, nc[4, ], nc[NULL, ], nc[nrow(nc) + 1, ])
 
-  expect_error(st_rbindlist(l))
-
-  with_st_rbindlist <- st_rbindlist(l, use_any_geometry = TRUE)
-  with_do.call      <- do.call(rbind, l)
-
-  expect_true(all(is.character(all.equal(with_st_rbindlist, with_do.call))))
-  # [1] "Attributes: < Component “row.names”: Modes: numeric, character >"
-  # [2] "Attributes: < Component “row.names”: target is numeric, current is character >"
-
-  with_id <- st_rbindlist(l, use_any_geometry = TRUE, idcol = "id")
+  with_id <- st_rbindlist(l, idcol = "id")
 
   get_id <- function(x) {if (is.null(l[[x]])) {integer(0)} else {rep(x, nrow(l[[x]]))} }
 
   id <- lapply(seq_along(l), get_id) %>% unlist()
 
-  expect_true(all(with_id$id == id))
+  expect_equal(with_id$id, id)
 })

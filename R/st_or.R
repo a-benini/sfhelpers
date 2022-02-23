@@ -124,6 +124,14 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     y <- sf::st_sf(geometry = y)
   }
 
+  # trigger warning independently from sf::st_intersection() and sfhelpers:::st_erase()
+  if (!isTRUE(all(c(sf::st_agr(x), sf::st_agr(y)) == "constant"))) {
+    warning(
+      "attribute variables are assumed to be spatially constant throughout all geometries",
+      call. = FALSE
+    )
+  }
+
   # make sure that homonymous attributes of x and y both get a distinct suffix
   x_names <- names(x)
   y_names <- names(y)
@@ -136,6 +144,11 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     names(x) <- ifelse(x_names %in% y_agr, paste0(x_names, x.suffix), x_names)
     names(y) <- ifelse(y_names %in% x_agr, paste0(y_names, y.suffix), y_names)
   }
+
+  # avoid getting repented warnings about non-constant attribute variables
+  # assumed to be constant
+  sf::st_agr(x) <- "constant"
+  sf::st_agr(y) <- "constant"
 
   # to get the remainder of the intersection sfhelpers:::st_erase()* is used (s. below) instead of the formerly here coded st_erase()
   # (*improved version of st_erase() found under ?st_difference)
@@ -160,15 +173,6 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     dmp <- st_dump(overlap, dim = dim)
     overlap <- rbind(overlap[-gc, ], dmp)
   }
-
-  # set all arguments of the input layers to "constant" to avoid getting ...
-  # ... repetitions of the warning message saying: ...
-  # ... "attribute variables are assumed to be spatially constant throughout all geometries"
-  # ... each time st_st_erase() is used / sf::st_difference() called internally
-  # if there's a reason for that very warning, it would have been triggered by ...
-  # ... the above use of st::intersection()!
-  sf::st_agr(x) <- "constant"
-  sf::st_agr(y) <- "constant"
 
   # get the non-intersecting parts with sfhelpers:::st_erase()
   x_diff <- st_erase(x, y)

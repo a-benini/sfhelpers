@@ -18,6 +18,7 @@ Depends:
 Imports: 
     data.table,
     sf,
+    stats,
     tmaptools,
     uuid
 Suggests: 
@@ -28,7 +29,6 @@ Suggests:
     rmarkdown,
     sp,
     stars,
-    stats,
     terra,
     testthat (>= 3.0.0),
     tmap

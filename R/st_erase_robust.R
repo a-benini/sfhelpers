@@ -57,7 +57,9 @@
 #' library(sf)
 #'
 #' # find code of helper function st_erase():
+#' \dontrun{
 #' ?geos_binary_ops
+#' }
 #'
 #' # copy function code:
 #' st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
@@ -84,8 +86,10 @@
 #' st_erase_robust(grid, nc) %>% plot()
 #'
 #' sf_use_s2(FALSE) # if spherical geometry (s2) is switched off,
-#' # sfhelpers::st_erase_robust() & helper function st_erase() work and return
-#' # the same:
+#' # sfhelpers::st_erase_robust() & helper function st_erase() should work and
+#' # return the same (st_erase() might still not work on some Linux operation
+#' # systems):
+#' \dontrun{
 #' all.equal(
 #'  st_erase_robust(grid, nc),
 #'  st_erase(grid, nc)
@@ -93,6 +97,7 @@
 #'
 #' # because internal handling of input y (nc) won't throw an error:
 #' st_union(st_combine(nc))
+#' }
 #' @export
 st_erase_robust <- function(x, y, check_overlap = FALSE, ...) {
   # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message

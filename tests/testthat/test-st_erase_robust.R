@@ -53,7 +53,36 @@ test_that("test-st_erase_robust", {
   # st_erase_robust() only works if st_crs(x) == st_crs(y)
   expect_error(st_erase_robust(poly_1, sfg_1))
   expect_error(st_erase_robust(poly_1, sfc_1))
+  # ----------------------------------------------------------------------------
+  # argument check_overlap
+  expect_error(
+    st_erase_robust(poly_1, poly_2, check_overlap = c(TRUE, FALSE)),
+    "check_overlap must be a single logical value: TRUE or FALSE"
+  )
 
+  expect_error(
+    st_erase_robust(poly_1, poly_2, check_overlap = NA),
+    "check_overlap must be a single logical value: TRUE or FALSE"
+  )
+
+  mpt  <- st_multipoint(c(p1, p2, p3, p4))
+  pl1  <- st_cast(mpt, "POLYGON")
+  pl2  <- pl1 * 3
+  pl1  <- pl1 + 1.5
+  pl3  <- st_buffer(p3, 0.25)
+  sfc1 <- st_make_grid(pl2, n = 3)
+  sfc2 <- st_sfc(pl1, pl3)
+
+  expect_equal(
+    st_erase_robust(pl1, pl2, check_overlap = TRUE), # pl1 is totally cover by pl2 (both of class sfg)
+    st_geometrycollection(list())
+  )
+
+  eq <- st_equals(
+    st_erase_robust(sfc1, sfc2),
+    st_erase_robust(sfc1, sfc2, check_overlap = TRUE)
+  )
+  expect_true(all(seq_along(eq) == sort(unlist(eq))))
   # ----------------------------------------------------------------------------
   # issues of sfhelpers version 0.0.0.9000 with st_erase_robust() /
   # sf::st_combine() / st::st_make_valid() / sf::sf_use_s2() fixed for
@@ -95,38 +124,13 @@ test_that("test-st_erase_robust", {
   area_ratio <- sum(st_area(erased_robust_s2_false)) / (sum(st_area(grid)) - sum(st_area(nc)))
   expect_equal(as.numeric(round(area_ratio, 6)), 0.999985) # erase by area close to 1
   # if  sf_use_s2() == FALSE st_erase_robust() does the same as st_erase():
+
+  # enable:
+  # rhub::check(platform = "ubuntu-gcc-release")
+  # rhub::check(platform = "fedora-clang-devel")
+  skip_on_os("linux")
   expect_equal(
     erased_robust_s2_false,
     st_erase(grid, nc)
   )
-  # ----------------------------------------------------------------------------
-  # argument check_overlap
-  expect_error(
-    st_erase_robust(poly_1, poly_2, check_overlap = c(TRUE, FALSE)),
-    "check_overlap must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_erase_robust(poly_1, poly_2, check_overlap = NA),
-    "check_overlap must be a single logical value: TRUE or FALSE"
-  )
-
-  mpt  <- st_multipoint(c(p1, p2, p3, p4))
-  pl1  <- st_cast(mpt, "POLYGON")
-  pl2  <- pl1 * 3
-  pl1  <- pl1 + 1.5
-  pl3  <- st_buffer(p3, 0.25)
-  sfc1 <- st_make_grid(pl2, n = 3)
-  sfc2 <- st_sfc(pl1, pl3)
-
-  expect_equal(
-    st_erase_robust(pl1, pl2, check_overlap = TRUE), # pl1 is totally cover by pl2 (both of class sfg)
-    st_geometrycollection(list())
-  )
-
-  eq <- st_equals(
-    st_erase_robust(sfc1, sfc2),
-    st_erase_robust(sfc1, sfc2, check_overlap = TRUE)
-  )
-  expect_true(all(seq_along(eq) == sort(unlist(eq))))
 })

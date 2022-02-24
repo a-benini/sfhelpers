@@ -49,8 +49,8 @@
 #' unnecessary geometric operations. Ideally the user has previous knowledge
 #' about how little or how much the input layers \code{x} and \code{y} overlap
 #' with each other in order to apply \code{check_overlap} in a informed way. In
-#' general setting \code{check_overlap} to \code{TRUE} is advantageous when
-#' \code{x} and/or \code{y} are larger geometry sets and include more complex
+#' general, setting \code{check_overlap} to \code{TRUE} is advantageous when
+#' \code{x} or \code{y} are large geometry sets and include more complex
 #' geometries.
 #'
 #' @examples

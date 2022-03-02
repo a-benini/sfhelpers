@@ -55,6 +55,11 @@
 #'   a informed way.
 #' }
 #'
+#' If the coordinates of the input are longlat degrees, setting
+#' \code{\link[sf]{sf_use_s2}} to \code{FALSE} can help to speed up
+#' \code{st_erase_robust()} and thus also \code{st_or()}. For information on
+#' this see details and examples sections of \code{\link{st_erase_robust}}.
+#'
 #' @importFrom data.table as.data.table rbindlist
 #' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection st_geometry
 #' st_drop_geometry st_is st_sfc st_intersects

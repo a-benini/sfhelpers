@@ -81,6 +81,11 @@ knowledge about how little or how much the input layers \code{x} and
 \code{y} overlap with each other in order to apply \code{check_overlap} in
 a informed way.
 }
+
+If the coordinates of the input are longlat degrees, setting
+\code{\link[sf]{sf_use_s2}} to \code{FALSE} can help to speed up
+\code{st_erase_robust()} and thus also \code{st_or()}. For information on
+this see details and examples sections of \code{\link{st_erase_robust}}.
 }
 \examples{
 library(dplyr)

@@ -130,21 +130,21 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
   if (!all(vapply(l_crs, function(x) { x == l_crs[[1]] }, logical(1)))) {
     stop("arguments have different crs", call. = FALSE)
   }
-  if (length(unique(vapply(l[is_not_null], st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
-    homogenize_geometry <- function(x) { if (is.null(x)) {x} else {sf::st_cast(x, "GEOMETRY", warn = FALSE)} }
-    l <- lapply(l, homogenize_geometry)
-  }
-  if(use_geometry == FALSE){
-    sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
-    sf <- sf[seq_len(nrow(sf)), ]
-    class(sf) <- c("sf", "data.frame")
-  } else {
+  if(use_geometry){
     geometry <- do.call(c, lapply(l[is_not_null], sf::st_geometry))
     tmp_col <- uuid::UUIDgenerate()
     get_non_geometry <- function(x) { if(is.null(x)) {x} else {data.table::as.data.table(sf::st_drop_geometry(x), keep.rownames = tmp_col)} }
     non_geometry <- data.table::rbindlist(lapply(l, get_non_geometry), ...)
     sf <- sf::st_sf(non_geometry, geometry)
     sf <- sf[ ,names(sf) != tmp_col]
+  } else {
+    if (length(unique(vapply(l[is_not_null], st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
+      homogenize_geometry <- function(x) { if (is.null(x)) {x} else {sf::st_cast(x, "GEOMETRY", warn = FALSE)} }
+      l <- lapply(l, homogenize_geometry)
+    }
+    sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
+    sf <- sf[seq_len(nrow(sf)), ]
+    class(sf) <- c("sf", "data.frame")
   }
   if(!is.null(geometry_name)){
     sf <- st_rename_geom(sf, geometry_name)

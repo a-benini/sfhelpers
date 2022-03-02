@@ -18,7 +18,9 @@ columns differing by name as well as by position across the \code{list}ed sf
 objects.}
 
 \item{geometry_name}{a single character string giving a user-defined name to
-the returned active list-column with simple feature geometries.}
+the returned active list-column with simple feature geometries. If
+unspecified / by default (\code{NULL}), the geometry column name is inherited
+from the first \code{sf} object \code{list}ed in the input.}
 }
 \value{
 a \code{sf} object
@@ -52,16 +54,6 @@ geometry columns and then matches them separately while the other columns
 can still be treated collectively by the arguments \code{use.names} and
 \code{fill}. Note that matching geometry columns separately requires more
 processing time.
-}
-If the argument \code{geometry_name} is unspecified (default \code{NULL}),
-the geometry column name of the returned \code{sf} object depends on the
-following:
-\itemize{
-\item If separately matched geometry columns (\code{use_geometry = TRUE})
-have a common name, this name persists, else \code{"geometry"} is used.
-\item If geometry (and other) columns are differently named and matched by
-their same position (\code{use.names = FALSE}), the geometry column name
-is inherited from the first \code{sf} object \code{list}ed in the input.
 }
 }
 \examples{
@@ -115,6 +107,12 @@ sapply(l, attr, "sf_column") # geometry column names of listed sf-objects
 # ... requires use_geometry = TRUE for detecting and binding the geometry
 # columns (separately from the attribute columns):
 st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE)
+
+# note: if use_geometry = TRUE, the name of the returned geometry column ...
+# ... is by default inherited from the first listed sf-object. The user ...
+# ... can set an alternative geometry column name:
+st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE,
+             geometry_name = "geom")
 }
 \seealso{
 \href{../doc/rbindlist_issues.html}{\code{vignette("rbindlist_issues")}}

@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -55,7 +57,7 @@
   </a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -76,7 +78,7 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/a-benini/sfhelpers/">
+  <a href="https://github.com/a-benini/sfhelpers/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
     github
@@ -94,17 +96,27 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="sfhelpers" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#sfhelpers" class="anchor"></a>sfhelpers</h1></div>
-<div id="purpose" class="section level2">
-<h2 class="hasAnchor">
-<a href="#purpose" class="anchor"></a>Purpose</h2>
-<p><code>sfhelpers</code> is a R package including functions helping to run routines related primarily to simple features (<a href="https://cran.r-project.org/web/packages/sf/index.html"><code>sf</code></a>) , but also to spatial objects of other classes / packages ( <a href="https://cran.r-project.org/web/packages/raster/index.html"><code>raster</code></a>, <a href="https://cran.r-project.org/web/packages/sp/index.html"><code>sp</code></a>, <a href="https://cran.r-project.org/web/packages/stars/index.html"><code>stars</code></a> ). <code>sfhelpers</code> is motivated by multiple requests for code or advice related to <code>sf</code>. By publishing <code>sfhelpers</code> I hope to at least partly satisfy these demands. <code>sfhelpers</code> is still very much in the development phase; it may or may not go any further. Suggestions are welcome.</p>
+<div class="section level1">
+<div class="page-header"><h1 id="sfhelpers">sfhelpers<a class="anchor" aria-label="anchor" href="#sfhelpers"></a>
+</h1></div>
+<div class="section level2">
+<h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a>
+</h2>
+<p><code>sfhelpers</code> is a R package including functions helping to
+run routines related primarily to simple features (<a href="https://cran.r-project.org/web/packages/sf/index.html" class="external-link"><code>sf</code></a>)
+, but also to spatial objects of other classes / packages ( <a href="https://cran.r-project.org/web/packages/raster/index.html" class="external-link"><code>raster</code></a>,
+<a href="https://cran.r-project.org/web/packages/sp/index.html" class="external-link"><code>sp</code></a>,
+<a href="https://cran.r-project.org/web/packages/stars/index.html" class="external-link"><code>stars</code></a>,
+<a href="https://cran.r-project.org/web/packages/terra/index.html" class="external-link"><code>terra</code></a>
+). <code>sfhelpers</code> is motivated by multiple requests for code or
+advice related to <code>sf</code>. By publishing <code>sfhelpers</code>
+I hope to at least partly satisfy these demands. <code>sfhelpers</code>
+is still very much in the development phase; it may or may not go any
+further. Suggestions are welcome.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install package devtools if not yet installed</span>
 <span class="co"># install.packages("devtools")</span>
@@ -113,108 +125,121 @@
 <span class="co">#   devtools::install_github("a-benini/sfhelpers")</span>
 
 <span class="co"># recommended: installation from GitHub including vignettes:</span>
- <span class="va">pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"magrittr"</span>, <span class="st">"dplyr"</span><span class="op">)</span>
+ <span class="va">pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"magrittr"</span>, <span class="st">"dplyr"</span><span class="op">)</span>
  <span class="co"># packages required to build sfhelpers's vignettes from GitHup repository</span>
- <span class="va">new_pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="va">pkgs_4_vignettes</span><span class="op">[</span><span class="op">!</span><span class="va">pkgs_4_vignettes</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">]</span>
+ <span class="va">new_pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="va">pkgs_4_vignettes</span><span class="op">[</span><span class="op">!</span><span class="va">pkgs_4_vignettes</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">]</span>
  <span class="co"># among these packages the ones not yet installed</span>
- <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span><span class="op">}</span>
+ <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span><span class="op">}</span>
  <span class="co"># install the still missing packages</span>
- <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"a-benini/sfhelpers"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+ <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"a-benini/sfhelpers"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
  <span class="co"># install sfhelpers from GitHup with its vignettes</span></code></pre></div>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/a-benini/sfhelpers">sfhelpers</a></span><span class="op">)</span>
-<span class="co">#&gt; Registered S3 methods overwritten by 'stars':</span>
-<span class="co">#&gt;   method             from</span>
-<span class="co">#&gt;   st_bbox.SpatRaster sf  </span>
-<span class="co">#&gt;   st_crs.SpatRaster  sf</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/a-benini/sfhelpers" class="external-link">sfhelpers</a></span><span class="op">)</span></code></pre></div>
 </div>
-<div id="usage-example" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage-example" class="anchor"></a>Usage Example</h2>
-<p><code><a href="reference/st_or.html">sfhelpers::st_or</a></code> is a <code>sf</code> equivalent of QGIS Union. <code>st_or</code> returns a geometry set containing overlapping and non-overlapping parts of two input <code>sf</code> objects (or <code>sfc</code>s).</p>
+<div class="section level2">
+<h2 id="usage-example">Usage Example<a class="anchor" aria-label="anchor" href="#usage-example"></a>
+</h2>
+<p><code><a href="reference/st_or.html">sfhelpers::st_or</a></code> is a <code>sf</code> equivalent of QGIS
+Union. <code>st_or</code> returns a geometry set containing overlapping
+and non-overlapping parts of two input <code>sf</code> objects (or
+<code>sfc</code>s).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span>
-<span class="co">#&gt; Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/a-benini/sfhelpers">sfhelpers</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="co">#&gt; Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1; sf_use_s2() is TRUE</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/a-benini/sfhelpers" class="external-link">sfhelpers</a></span><span class="op">)</span>
 
 <span class="co"># the two included demo sf-objects have partly identically named attribute columns</span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html">st_agr</a></span><span class="op">(</span><span class="va">poly_1</span><span class="op">)</span>
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_1</span><span class="op">)</span>
 <span class="co">#&gt;    A    B    C </span>
 <span class="co">#&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; </span>
 <span class="co">#&gt; Levels: constant aggregate identity</span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html">st_agr</a></span><span class="op">(</span><span class="va">poly_2</span><span class="op">)</span>
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_2</span><span class="op">)</span>
 <span class="co">#&gt;    A    D    E </span>
 <span class="co">#&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; </span>
 <span class="co">#&gt; Levels: constant aggregate identity</span>
 
 <span class="co"># st_or() suffixes by default originally identically named attribute columns</span>
-<span class="fu"><a href="reference/st_or.html">st_or</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">poly_1</span>, y <span class="op">=</span> <span class="va">poly_2</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="reference/st_or.html">st_or</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">poly_1</span>, y <span class="op">=</span> <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Warning: attribute variables are assumed to be spatially constant throughout all</span>
 <span class="co">#&gt; geometries</span>
-<span class="co">#&gt;      A.x  B    C  A.y  D    E</span>
-<span class="co">#&gt; 1     Pq  1 1983    z 48 2015</span>
-<span class="co">#&gt; 1.1   Pq  1 1983    y 36 2016</span>
-<span class="co">#&gt; 2     Qr  2 1984    y 36 2016</span>
-<span class="co">#&gt; 1.2   Pq  1 1983    x 24 2017</span>
-<span class="co">#&gt; 3     Rs  3 1985    x 24 2017</span>
-<span class="co">#&gt; 1.3   Pq  1 1983    w 12 2018</span>
-<span class="co">#&gt; 2.1   Qr  2 1984    w 12 2018</span>
-<span class="co">#&gt; 3.1   Rs  3 1985    w 12 2018</span>
-<span class="co">#&gt; 4     St  4 1986    w 12 2018</span>
-<span class="co">#&gt; 22    Qr  2 1984 &lt;NA&gt; NA   NA</span>
-<span class="co">#&gt; 32    Rs  3 1985 &lt;NA&gt; NA   NA</span>
-<span class="co">#&gt; 41    St  4 1986 &lt;NA&gt; NA   NA</span>
-<span class="co">#&gt; 11  &lt;NA&gt; NA   NA    z 48 2015</span>
-<span class="co">#&gt; 21  &lt;NA&gt; NA   NA    y 36 2016</span>
-<span class="co">#&gt; 31  &lt;NA&gt; NA   NA    x 24 2017</span>
+<span class="co">#&gt;     A.x  B    C  A.y  D    E</span>
+<span class="co">#&gt; 1    Pq  1 1983    z 48 2015</span>
+<span class="co">#&gt; 2    Pq  1 1983    y 36 2016</span>
+<span class="co">#&gt; 3    Qr  2 1984    y 36 2016</span>
+<span class="co">#&gt; 4    Pq  1 1983    x 24 2017</span>
+<span class="co">#&gt; 5    Rs  3 1985    x 24 2017</span>
+<span class="co">#&gt; 6    Pq  1 1983    w 12 2018</span>
+<span class="co">#&gt; 7    Qr  2 1984    w 12 2018</span>
+<span class="co">#&gt; 8    Rs  3 1985    w 12 2018</span>
+<span class="co">#&gt; 9    St  4 1986    w 12 2018</span>
+<span class="co">#&gt; 10   Qr  2 1984 &lt;NA&gt; NA   NA</span>
+<span class="co">#&gt; 11   Rs  3 1985 &lt;NA&gt; NA   NA</span>
+<span class="co">#&gt; 12   St  4 1986 &lt;NA&gt; NA   NA</span>
+<span class="co">#&gt; 13 &lt;NA&gt; NA   NA    z 48 2015</span>
+<span class="co">#&gt; 14 &lt;NA&gt; NA   NA    y 36 2016</span>
+<span class="co">#&gt; 15 &lt;NA&gt; NA   NA    x 24 2017</span>
 
-<span class="fu"><a href="reference/st_or.html">st_or</a></span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html">plot</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="reference/st_or.html">st_or</a></span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Warning: attribute variables are assumed to be spatially constant throughout all</span>
 <span class="co">#&gt; geometries</span></code></pre></div>
 <p><img src="reference/figures/README-example-1.png" width="100%"></p>
-<p>For the rest of the functions included in <code>sfhelpers</code> see <a href="https://a-benini.github.io/sfhelpers/reference/index.html">here</a>.</p>
+<p>For the rest of the functions included in <code>sfhelpers</code> see
+<a href="https://a-benini.github.io/sfhelpers/reference/index.html">here</a>.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/a-benini/sfhelpers/">https://​github.com/​a-benini/​sfhelpers/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/a-benini/sfhelpers/issues">https://​github.com/​a-benini/​sfhelpers/​issues</a>
-</li>
+<li><a href="https://github.com/a-benini/sfhelpers/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/a-benini/sfhelpers/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing sfhelpers</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Attilio Benini <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Attilio Benini.</p>
+  <p></p>
+<p>Developed by Attilio Benini.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -222,6 +247,8 @@
 
   
 
+
+  
 
   </body>
 </html>

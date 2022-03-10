@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://a-benini.github.io/sfhelpers/404.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/articles/rbindlist_issues.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/authors.html</loc>
+  </url>
+  <url>
     <loc>https://a-benini.github.io/sfhelpers/index.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/reference/index.html</loc>
   </url>
   <url>
     <loc>https://a-benini.github.io/sfhelpers/reference/poly_1.html</loc>
@@ -11,6 +35,9 @@
   </url>
   <url>
     <loc>https://a-benini.github.io/sfhelpers/reference/st_bbox_common.html</loc>
+  </url>
+  <url>
+    <loc>https://a-benini.github.io/sfhelpers/reference/st_disaggregate.html</loc>
   </url>
   <url>
     <loc>https://a-benini.github.io/sfhelpers/reference/st_erase_robust.html</loc>
@@ -23,8 +50,5 @@
   </url>
   <url>
     <loc>https://a-benini.github.io/sfhelpers/reference/st_rename_geometry.html</loc>
-  </url>
-  <url>
-    <loc>https://a-benini.github.io/sfhelpers/articles/rbindlist_issues.html</loc>
   </url>
 </urlset>

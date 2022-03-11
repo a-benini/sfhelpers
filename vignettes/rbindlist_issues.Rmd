@@ -194,7 +194,7 @@ list(nc, nc_3857) %>% lapply(st_crs) %>% n_distinct()
 A `list` with `sf`-objects having geometry columns of different `geometry_type`s:
 
 ```{r}
-l_diff_geom_type <- list(nc[1:3, ], st_cast(nc[4, ], "POLYGON", warn = FALSE))
+l_diff_geom_type <- list(nc[c(17, 56), ], st_cast(nc[4, ], "POLYGON", warn = FALSE))
 
 sapply(l_diff_geom_type, st_geometry_type, by_geometry = FALSE) %>% unique()
 ```
@@ -213,7 +213,7 @@ But `rbindlist()` can't handle a `list` containing different `geometry_type`s:
 ```{r, error=TRUE}
 rbindlist(l_diff_geom_type)
 ```
-
+<a name="slow_method"></a>
 In order to make such a `list` workable for `rbindlist()`, the `geometry_type`s
 have to be homogenized:
 
@@ -230,6 +230,31 @@ stack them:
 sf_rbindlist <- rbindlist(l_homogenized_geom_type) %>% st_as_sf()
 
 st_geometry_type(sf_rbindlist, by_geometry = FALSE)
+```
+
+Note that the [above demonstrated way](#slow_method) of homogenizing
+`geometry_type`s isn't very time efficient for large `list`s of `sf`-objects.
+Luckily there's a faster alternative:
+
+```{r}
+l <- l_diff_geom_type # for the sake of code readability, copy list as short-named object
+
+for (i in seq_along(l)) {
+  class(l[[i]][[attr(l[[i]], "sf_column")]])[[1]] <- "sfc_GEOMETRY"
+}
+```
+
+We check if the two homogenizing methods are equivalent:
+
+```{r}
+all.equal(l_homogenized_geom_type, l)
+```
+
+```{r, eval = FALSE, echo = FALSE}
+all.equal(
+  sf_rbindlist, 
+  st_as_sf(rbindlist(l))
+  )
 ```
 
 ```{r, eval = FALSE, echo = FALSE}
@@ -269,6 +294,10 @@ If so, homogenize them:
 
 ```{r eval = FALSE}
 list_of_sf <- lapply(list_of_sf, st_cast, to = "GEOMETRY", warn = FALSE)
+# or more advisable because faster (for large lists):
+for (i in seq_along(list_of_sf)) {
+  class(list_of_sf[[i]][[attr(list_of_sf[[i]], "sf_column")]])[[1]] <- "sfc_GEOMETRY"
+}
 ```
 
 3. Bind `list` of `sf`-objects to a single `sf`-object (which is also a

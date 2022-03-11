@@ -19,7 +19,7 @@
 #' @export
 #'
 #' @importFrom data.table as.data.table rbindlist
-#' @importFrom sf st_as_sf st_crs st_geometry_type st_geometry st_drop_geometry st_sf st_cast
+#' @importFrom sf st_as_sf st_crs st_geometry_type st_geometry st_drop_geometry st_sf
 #' @importFrom uuid UUIDgenerate
 #'
 #' @details \code{st_rbindlist()} is basically a wrapper for
@@ -136,9 +136,10 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
     sf <- sf::st_sf(non_geometry, geometry)
     sf <- sf[ ,names(sf) != tmp_col]
   } else {
-    if (length(unique(vapply(l[is_not_null], st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
-      homogenize_geometry <- function(x) { if (is.null(x)) {x} else {sf::st_cast(x, "GEOMETRY", warn = FALSE)} }
-      l <- lapply(l, homogenize_geometry)
+    if (length(unique(vapply(l[is_not_null], sf::st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
+      for (i in seq_along(l)[is_not_null]) {
+        class(l[[i]][[attr(l[[i]], "sf_column")]])[[1]] <- "sfc_GEOMETRY"
+      }
     }
     sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
     sf <- sf[seq_len(nrow(sf)), ]

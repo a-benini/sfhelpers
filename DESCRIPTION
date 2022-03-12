@@ -17,6 +17,7 @@ Depends:
     R (>= 3.5.0)
 Imports: 
     data.table,
+    lifecycle,
     sf,
     stats,
     tmaptools,
@@ -30,7 +31,8 @@ Suggests:
     stars,
     terra,
     testthat (>= 3.0.0),
-    tmap
+    tmap,
+    utils
 URL: https://github.com/a-benini/sfhelpers, https://a-benini.github.io/sfhelpers/
 BugReports: https://github.com/a-benini/sfhelpers/issues
 VignetteBuilder: knitr

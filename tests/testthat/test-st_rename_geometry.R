@@ -23,4 +23,18 @@ test_that("test-st_rename_geometry", {
     attr(poly_1_renamed, "sf_column"),
     setdiff(names(poly_1_renamed), names(poly_1))
   )
+
+  if(packageVersion("sf") >= '1.0.6'){
+    expect_equal(
+      st_rename_geometry(poly_1, "renamed_geometry"),
+      st_set_geometry(poly_1, "renamed_geometry")
+    )
+
+    poly_1_copy <- poly_1
+    st_geometry(poly_1_copy) <- "renamed_geometry"
+    expect_equal(
+      st_rename_geometry(poly_1, "renamed_geometry"),
+      poly_1_copy
+    )
+  }
 })

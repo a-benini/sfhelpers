@@ -15,7 +15,14 @@ st_rename_geometry(obj, geometry_name)
 a \code{sf} object with renamed geometry list-column.
 }
 \description{
-Rename geometry column of an sf object
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+With \code{sf} package version >= 1.0-6 \code{\link[sf]{st_set_geometry}} and
+\code{\link[sf]{st_geometry<-}} have become handy tools for renaming the
+active geometry columns of \code{sf} objects. \code{st_set_geometry} now
+offers the same functionality as \code{st_rename_geometry} (s. examples), and
+it is faster, which is advantageous when working on large \code{list}s of
+\code{sf} objects.
 }
 \details{
 \code{st_rename_geometry()} is inspired by code found on
@@ -33,4 +40,12 @@ named geometry columns or \code{list}s of such before binding them to a single
 # current active list-column with simple feature geometries:
 attr(poly_1, "sf_column")
 st_rename_geometry(poly_1, "renamed_geometry")
+
+library(sf)
+if(packageVersion("sf") >= '1.0.6'){
+  all.equal(
+    st_rename_geometry(poly_1, "renamed_geometry"),
+    st_set_geometry(poly_1, "renamed_geometry")
+  )
+}
 }

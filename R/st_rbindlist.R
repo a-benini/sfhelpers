@@ -124,8 +124,7 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
   if(!any(is_not_null)) {
     stop("no sf objects included in input list", call. = FALSE)
   }
-  l_crs <- lapply(l[is_not_null], sf::st_crs)
-  if (!all(vapply(l_crs, function(x) { x == l_crs[[1]] }, logical(1)))) {
+  if (length(unique(lapply(l[is_not_null], sf::st_crs))) > 1) {
     stop("arguments have different crs", call. = FALSE)
   }
   if(use_geometry){

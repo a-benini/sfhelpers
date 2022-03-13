@@ -13,7 +13,7 @@
 #' @param warn logical; if \code{TRUE}, warn if attributes are assigned to sub-geometries
 #'
 #' @importFrom sf st_agr st_geometry st_is_empty st_is st_sfc st_drop_geometry
-#' st_crs st_sf st_geometry_type st_cast
+#' st_crs st_sf st_geometry_type st_cast st_set_geometry
 #' @importFrom stats aggregate
 #' @importFrom uuid UUIDgenerate
 #'
@@ -174,7 +174,7 @@ st_disaggregate <- function(x, only_geometrycollection = FALSE, keep_empty = FAL
     geometry     <- do.call(c, lapply(l_sfg, sf::st_sfc, crs = sf::st_crs(x)))
     rep_row      <- rep(seq_len(nrow(x_gc)), lengths(l_sfg))
     non_geometry <- sf::st_drop_geometry(x_gc)[rep_row, , drop = FALSE]
-    x_gc_former  <- st_rename_geom(sf::st_sf(non_geometry, geometry), attr(x, "sf_column"))
+    x_gc_former  <- sf::st_set_geometry(sf::st_sf(non_geometry, geometry), attr(x, "sf_column"))
     x            <- rbind(x[!is_gc, ], x_gc_former)
   }
 

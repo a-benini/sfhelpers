@@ -251,7 +251,7 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
 
   # name of geometry column is inherited from input layer x*
   # *same behavior as sf::st_intersection():
-  output <- st_rename_geom(output, attr(x, "sf_column"))
+  sf::st_geometry(output) <- attr(x, "sf_column")
 
   return(output)
 }

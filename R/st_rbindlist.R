@@ -67,7 +67,7 @@
 #' # same-named):
 #' list_of_sf <- lapply(
 #'   1:nrow(nc),
-#'   function(x) st_rename_geometry(nc[x, ], paste0("geom_", x))
+#'   function(x) st_set_geometry(nc[x, ], paste0("geom_", x))
 #'   )
 #' # such a list of sf-objects is easy to stack ...
 #' nc_new_2 <- st_rbindlist(list_of_sf, use.name = FALSE)
@@ -94,7 +94,7 @@
 #' # and (if existing) identically named attribute columns ...
 #' l <- lapply(
 #'   seq_along(l),
-#'   function(x) st_rename_geometry(l[[x]], paste0("geom_", x))
+#'   function(x) st_set_geometry(l[[x]], paste0("geom_", x))
 #'   )
 #' sapply(l, attr, "sf_column") # geometry column names of listed sf-objects
 #'
@@ -146,10 +146,10 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
     class(sf) <- c("sf", "data.frame")
   }
   if(!is.null(geometry_name)){
-    sf <- st_rename_geom(sf, geometry_name)
+    sf::st_geometry(sf) <- geometry_name
   }
   if(is.null(geometry_name) & use_geometry){
-    sf <- st_rename_geom(sf, attr(l[is_not_null][[1]], "sf_column"))
+    sf::st_geometry(sf) <- attr(l[is_not_null][[1]], "sf_column")
   }
   return(sf)
 }

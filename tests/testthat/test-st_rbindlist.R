@@ -54,7 +54,7 @@ test_that("test-st_rbindlist", {
   matched_by_names <- st_rbindlist(list(poly_1, poly_2), use.names = TRUE, fill = TRUE)
   expect_true(c(names(poly_1), names(poly_2)) %in% names(matched_by_names) %>% all())
 
-  poly_1_new_geom <- st_rename_geometry(poly_1, "new_geom")
+  poly_1_new_geom <- st_set_geometry(poly_1, "new_geom")
 
   expect_error(
     # differently named and positioned geometry columns can't be matched by name!

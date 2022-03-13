@@ -74,9 +74,8 @@ st_bbox_list <- function(l) {
     if (inherits(x, c("SpatExtent", "SpatRaster", "SpatVector"))) { tmaptools::bb(sf::st_bbox(x)) } else { tmaptools::bb(x) }
   }
   l_bb <- lapply(l, bb_inclusive_terra)
-  l_crs <- lapply(l_bb, sf::st_crs)
-  if (!all(vapply(l_crs, function(x) {x == l_crs[[1]]}, logical(1)))) {
-    stop("arguments have different crs", call. = TRUE)
+  if (length(unique(lapply(l_bb, sf::st_crs))) > 1) {
+    stop("arguments have different crs", call. = FALSE)
   }
   mat_bb <- vapply(l_bb, invisible, numeric(4))
   if (anyNA(mat_bb)) {
@@ -86,5 +85,5 @@ st_bbox_list <- function(l) {
   ymin <- min(mat_bb["ymin", ])
   xmax <- max(mat_bb["xmax", ])
   ymax <- max(mat_bb["ymax", ])
-  sf::st_bbox(c(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax), crs = l_crs[[1]])
+  sf::st_bbox(c(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax), crs = sf::st_crs(l_bb[[1]]))
 }

@@ -1,3 +1,15 @@
+# sfhelpers 0.0.0.9002
+* `st_rename_geometry()` function has been superseded because with `sf` package
+version >= 1.0-6 `st_set_geometry()` offers the same functionality.
+* dependency of imported `sf` package set to version >= 1.0-6. This made it
+possible to replace package-internal dependency on functions
+`sfhelpers::st_rename_geometry()` and `sfhelpers:::st_rename_geom()` with
+`sf::st_set_geometry()` and `sf::st_geometry()<-`.
+* more efficient homogenizing of active geometry columns of `st_rbindlist()` input.
+* vignette `rbindlist_issues` updated.
+* more efficient CRS check used within functions `st_rbindlist()`, `st_bbox_list()`
+and `st_bbox_common()`.
+
 # sfhelpers 0.0.0.9001
 * fixed bug: `st_or()` and `st_erase_robust()` return expected geometries.
 * fixed bug: `st_or()` works with input layers having differently named geometry columns.

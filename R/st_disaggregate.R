@@ -14,7 +14,6 @@
 #'
 #' @importFrom sf st_agr st_geometry st_is_empty st_is st_sfc st_drop_geometry
 #' st_crs st_sf st_geometry_type st_cast st_set_geometry
-#' @importFrom stats aggregate
 #' @importFrom uuid UUIDgenerate
 #'
 #' @return an object of class \code{sf}, if the input \code{x} itself is an
@@ -206,7 +205,7 @@ st_disaggregate <- function(x, only_geometrycollection = FALSE, keep_empty = FAL
     }
     sf::st_agr(x) <- x_agr # update attributes of sf-obj
     # add row names
-    suffix        <- unlist(stats::aggregate(x[[tmp_id]], by = list(x[[tmp_id]]), seq_along)[[2]]) - 1
+    suffix        <- unlist(lapply(rle(x[[tmp_id]])$lengths, seq_len)) - 1
     rownames(x)   <- paste0(x[[tmp_id]], ifelse(suffix == 0, "", paste0(".", suffix)))
     x[, names(x) != tmp_id] # drop tmp. id
   }

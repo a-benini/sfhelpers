@@ -19,7 +19,6 @@ Imports:
     data.table,
     lifecycle,
     sf (>= 1.0.6),
-    stats,
     tmaptools,
     uuid
 Suggests: 

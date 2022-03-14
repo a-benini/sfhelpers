@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9002</span>
       </span>
     </div>
 
@@ -88,7 +88,7 @@
     <dl><dt>l</dt>
 <dd><p><code>list</code> of objects of the class <code>sf</code></p></dd>
 <dt>...</dt>
-<dd><p>arguments of the function <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></code>
+<dd><p>arguments of the function <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></code>
 except <code>l</code></p></dd>
 <dt>use_geometry</dt>
 <dd><p><code>TRUE</code> detects and binds the active list-columns
@@ -152,7 +152,7 @@ processing time.</p></li>
 <span class="r-in"><span class="co"># same-named):</span></span>
 <span class="r-in"><span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
 <span class="r-in">  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="st_rename_geometry.html">st_rename_geometry</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"geom_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_set_geometry</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"geom_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="co"># such a list of sf-objects is easy to stack ...</span></span>
 <span class="r-in"><span class="va">nc_new_2</span> <span class="op">&lt;-</span> <span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">list_of_sf</span>, use.name <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -200,7 +200,7 @@ processing time.</p></li>
 <span class="r-in"><span class="co"># and (if existing) identically named attribute columns ...</span></span>
 <span class="r-in"><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
 <span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="st_rename_geometry.html">st_rename_geometry</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"geom_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_set_geometry</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"geom_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l</span>, <span class="va">attr</span>, <span class="st">"sf_column"</span><span class="op">)</span> <span class="co"># geometry column names of listed sf-objects</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "geom_1" "geom_2" "geom_3"</span>

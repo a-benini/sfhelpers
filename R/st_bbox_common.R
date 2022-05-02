@@ -51,7 +51,9 @@
 #' vect <- vect(sf) # class SpatVector
 #'
 #' bbox_common <- st_bbox_common(rast, vect)
-#' plot(rast, xlim = bbox_common[c("xmin", "xmax")], ylim = bbox_common[c("ymin", "ymax")])
+#' plot(rast, ext = bbox_common[c("xmin", "xmax", "ymin", "ymax")])
+#' # or
+#' # plot(rast, ext = bbox_common[c(1, 3, 2, 4)])
 #' plot(vect, add = TRUE)
 #'
 #' tm_shape(rast, bbox = bbox_common) + tm_raster(title = "rast", style = "cont") +

@@ -153,6 +153,10 @@ st_disaggregate <- function(x, only_geometrycollection = FALSE, keep_empty = FAL
   tmp_id      <- uuid::UUIDgenerate()
   x[, tmp_id] <- seq_len(nrow(x))
 
+  # keep input row names as column
+  row_names      <- uuid::UUIDgenerate()
+  x[ ,row_names] <- rownames(x)
+
   # preserve attributes of sf object
   x_agr <- sf::st_agr(x)
 
@@ -206,7 +210,7 @@ st_disaggregate <- function(x, only_geometrycollection = FALSE, keep_empty = FAL
     sf::st_agr(x) <- x_agr # update attributes of sf-obj
     # add row names
     suffix        <- unlist(lapply(rle(x[[tmp_id]])$lengths, seq_len)) - 1
-    rownames(x)   <- paste0(x[[tmp_id]], ifelse(suffix == 0, "", paste0(".", suffix)))
-    x[, names(x) != tmp_id] # drop tmp. id
+    rownames(x)   <- paste0(x[[row_names]], ifelse(suffix == 0, "", paste0(".", suffix)))
+    x[, !names(x) %in% c(tmp_id, row_names)] # drop tmp. id & col. with input row names
   }
 }

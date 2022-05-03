@@ -175,6 +175,7 @@ test_that("test-st_disaggregate", {
 
   sf  <- st_sf(id = seq_along(sfc), a = "A", b = "B", c = "C", geom = sfc)
   st_agr(sf) <- c("constant", "aggregate", "identity", NA_agr_)
+  rownames(sf) <- LETTERS[1:3]
 
   expect_equal(
     st_disaggregate(sf, warn = FALSE),

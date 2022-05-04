@@ -37,7 +37,7 @@ library(data.table)
 library(sf)
 ```
 
-## Compare `rbindlist()` and `do.call()`
+## Compare `rbindlist()` and `do.call(rbind, )`
 
 ### Inherited classes and `bbox`
 
@@ -49,20 +49,20 @@ nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 list_of_sf <- lapply(seq_len(nrow(nc)), function(x) nc[x, ])
 ```
 
-Binding such a `list` of `sf` with `do.call()` to a single `sf` object works easily
-(as long as the `list` is rather small): 
+Binding such a `list` of `sf` with `do.call(rbind, )` to a single `sf` object
+works easily (as long as the `list` is rather small): 
 
 ```{r do-call-bind-c}
-nc_do.call <- do.call(rbind, list_of_sf)
+nc_rbind <- do.call(rbind, list_of_sf)
 ```
 
 And will return the expected object of the class `sf`:
 
 ```{r check-do-call-returns}
-all.equal(nc_do.call, nc)
+all.equal(nc_rbind, nc)
 ```
 
-What's different when `rbindlist()` is used instead of `do.call()`?
+What's different when `rbindlist()` is used instead of `do.call(rbind, )`?
 
 First of all, `rbindlist()` on its own does not bind a `list` of `sf` to an
 object of the class `sf`:
@@ -79,7 +79,7 @@ nc_rbindlist <- rbindlist(list_of_sf) %>% st_as_sf()
 ```
 
 Is the return of the pipe `rbindlist() %>% st_as_sf()` equivalent to the one of
-`do.call()`?
+`do.call(rbind, )`?
 
 ```{r check-rbindlist-st-as-sf-return}
 all.equal(nc_rbindlist, nc)
@@ -137,8 +137,8 @@ all.equal(nc_rbindlist, nc)
 ### CRS
 
 `list`s containing `sf`-objects with different CRS are treated quite differently
-by `do.call()` and `rbindlist() %>% st_as_sf()`. To demonstrate that, we create
-such a `list`:
+by `do.call(rbind, )` and `rbindlist() %>% st_as_sf()`. To demonstrate that, we
+create such a `list`:
 
 ```{r unequal-crs}
 nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
@@ -148,14 +148,14 @@ nc_3857 <- st_transform(nc, 3857)
 list_of_sf_with_unequal_crs <- list(nc, nc_3857)
 ```
 
-`do.call()` does not bind a `list` of `sf`-objects with unequal CRS and throws a
-corresponding error-message:
+`rbind()` does not bind `sf`-objects with unequal CRS and throws a corresponding
+error-message:
 
 ```{r error = TRUE}
 do.call(rbind, list_of_sf_with_unequal_crs)
 ```
 
-Whereas the pipe `rbindlist() %>% st_as_sf` doesn't seem to be affected: 
+Whereas `rbindlist()` doesn't seem to be affected: 
 
 ```{r}
 sf_dt <- list_of_sf_with_unequal_crs %>% rbindlist() %>% st_as_sf()
@@ -199,8 +199,8 @@ l_diff_geom_type <- list(nc[c(17, 56), ], st_cast(nc[4, ], "POLYGON", warn = FAL
 sapply(l_diff_geom_type, st_geometry_type, by_geometry = FALSE) %>% unique()
 ```
 
-`do.call()` can easily stack such a `list` and the returned `geometry_type` is
-`GEOMETRY`:
+`rbind()` can easily stack `sf`-objects with geometry columns of different
+`geometry_type`s and the returned `geometry_type` is `GEOMETRY`:
 
 ```{r}
 sf_do.call <- do.call(rbind, l_diff_geom_type)
@@ -266,10 +266,10 @@ all.equal(sf_rbindlist, sf_do.call)
 
 ## Conclusions
 
-The use of `data.table::rbindlist()` as a fast alternative to `do.call()` for
-binding `list`s of `sf`-objects to a single `sf`-object is justified in
-situations when `do.call()` is too slow. It does, however, require appropriate
-pre- and post-treatment:
+The use of `data.table::rbindlist()` as a fast alternative to `do.call(rbind, )`
+for binding `list`s of `sf`-objects to a single `sf`-object is justified in
+situations when `do.call(rbind, )` is too slow. It does, however, require
+appropriate pre- and post-treatment:
 
 1. Check if a `list` of `sf`-objects contains more than 1 distinct CRS:
 

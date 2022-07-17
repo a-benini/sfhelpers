@@ -11,12 +11,10 @@ st_bbox_list(l)
 }
 \arguments{
 \item{...}{objects that can be coerced to bounding boxes with
-\code{\link[tmaptools]{bb}} or are of the classes \code{SpatExtent},
-\code{SpatRaster} and \code{SpatVector} from \code{\link[terra]{terra-package}}}
+\code{\link[tmaptools]{bb}} or with \code{\link[sf]{st_bbox}}}
 
 \item{l}{\code{list} of objects that can be coerced to bounding boxes with
-\code{\link[tmaptools]{bb}} or are of the classes \code{SpatExtent},
-\code{SpatRaster} and \code{SpatVector} from \code{\link[terra]{terra-package}}}
+\code{\link[tmaptools]{bb}} or with \code{\link[sf]{st_bbox}}}
 }
 \value{
 object of the class \code{bbox} equal to the return of

@@ -58,4 +58,10 @@ test_that("test-st_bbox_common", {
     st_bbox_common(r, sf),
     st_bbox_common(rast, vect)
   )
+
+  l <- st_linestring(cbind(0:4, 5:1))
+  expect_equal(
+    st_bbox_common(st_sfc(l)),
+    st_bbox_common(l)
+  )
 })

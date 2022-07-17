@@ -5,8 +5,7 @@
 #' input (\code{list}ed) objects
 #'
 #' @param ... objects that can be coerced to bounding boxes with
-#' \code{\link[tmaptools]{bb}} or are of the classes \code{SpatExtent},
-#' \code{SpatRaster} and \code{SpatVector} from \code{\link[terra]{terra-package}}
+#' \code{\link[tmaptools]{bb}} or with \code{\link[sf]{st_bbox}}
 #'
 #' @importFrom tmaptools bb
 #' @importFrom sf st_crs st_bbox
@@ -69,19 +68,26 @@ st_bbox_common <- function(...) {
 #' @export
 #' @rdname st_bbox_common
 #' @param l \code{list} of objects that can be coerced to bounding boxes with
-#' \code{\link[tmaptools]{bb}} or are of the classes \code{SpatExtent},
-#' \code{SpatRaster} and \code{SpatVector} from \code{\link[terra]{terra-package}}
+#' \code{\link[tmaptools]{bb}} or with \code{\link[sf]{st_bbox}}
 st_bbox_list <- function(l) {
-  bb_inclusive_terra <- function(x) {
-    if (inherits(x, c("SpatExtent", "SpatRaster", "SpatVector"))) { tmaptools::bb(sf::st_bbox(x)) } else { tmaptools::bb(x) }
+  bb_or_st_bbox <- function(x) {
+    suppressWarnings(default <- try(tmaptools::bb(x), silent = TRUE))
+    if (inherits(default, "try-error")) {
+      suppressWarnings(default <- try(tmaptools::bb(sf::st_bbox(x)), silent = TRUE))
+    }
+    if (inherits(default, "try-error")) {
+      stop("at least one of the listed arguments can not be coerced to bounding boxes with tmaptools::bb() or with sf::st_bbox()", call. = FALSE)
+    } else {
+      default
+    }
   }
-  l_bb <- lapply(l, bb_inclusive_terra)
+  l_bb <- lapply(l, bb_or_st_bbox)
   if (length(unique(lapply(l_bb, sf::st_crs))) > 1) {
     stop("arguments have different crs", call. = FALSE)
   }
   mat_bb <- vapply(l_bb, invisible, numeric(4))
   if (anyNA(mat_bb)) {
-    stop("at least one of the listed arguments has one or more missing values for its bbox object", call. = TRUE)
+    stop("at least one of the listed arguments has one or more missing values for its bbox object", call. = FALSE)
   }
   xmin <- min(mat_bb["xmin", ])
   ymin <- min(mat_bb["ymin", ])

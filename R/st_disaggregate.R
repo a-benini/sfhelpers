@@ -13,7 +13,7 @@
 #' @param warn logical; if \code{TRUE}, warn if attributes are assigned to sub-geometries
 #'
 #' @importFrom sf st_agr st_geometry st_is_empty st_is st_sfc st_drop_geometry
-#' st_crs st_sf st_geometry_type st_cast st_set_geometry
+#' st_crs st_sf st_geometry_type st_cast st_set_geometry st_zm
 #' @importFrom uuid UUIDgenerate
 #'
 #' @return an object of class \code{sf}, if the input \code{x} itself is an
@@ -161,7 +161,7 @@ st_disaggregate <- function(x, only_geometrycollection = FALSE, keep_empty = FAL
   x_agr <- sf::st_agr(x)
 
   # keep or drop empty geometries
-  is_empty <- sf::st_is_empty(x)
+  is_empty <- sf::st_is_empty(sf::st_zm(x))
   if (keep_empty) {
     x_empty <- x[is_empty, ]
   } else {

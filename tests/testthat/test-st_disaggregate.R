@@ -191,4 +191,20 @@ test_that("test-st_disaggregate", {
   expect_true(
     all(seq_along(eq) %in% unlist(eq))
   )
+
+  xyzm_1 <- st_point(rep(0, 4))
+  xyzm_2 <- st_point(1:4)
+  xyzm_3 <- st_point(rep(NA_integer_, 4), dim = "XYZM")
+  xyzm_gc <- st_geometrycollection(list(xyzm_1, xyzm_2, xyzm_3))
+
+  expect_equal(
+    st_disaggregate(xyzm_gc),
+    st_sfc(xyzm_1, xyzm_2, xyzm_3)
+  )
+
+  xyzm_sfc <- st_sfc(st_multipoint(c(xyzm_1, xyzm_2)), xyzm_3)
+  expect_equal(
+    st_disaggregate(xyzm_sfc),
+    st_sfc(xyzm_1, xyzm_2)
+  )
 })

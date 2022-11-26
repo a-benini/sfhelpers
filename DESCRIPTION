@@ -31,6 +31,7 @@ Suggests:
     terra,
     testthat (>= 3.0.0),
     tmap,
+    units,
     utils
 URL: https://github.com/a-benini/sfhelpers, https://a-benini.github.io/sfhelpers/
 BugReports: https://github.com/a-benini/sfhelpers/issues

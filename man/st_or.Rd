@@ -8,8 +8,7 @@ st_or(
   x,
   y,
   dim = 2,
-  x.suffix = ".x",
-  y.suffix = ".y",
+  suffix = c(".x", ".y"),
   suffix.all = FALSE,
   check_overlap = FALSE,
   use_st_combine = TRUE,
@@ -25,16 +24,12 @@ st_or(
 the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
 surfaces.}
 
-\item{x.suffix}{a single character string (default \code{".x"}) attached as
-suffix to attribute headings inherited from argument \code{x}}
-
-\item{y.suffix}{a single character string (default \code{".y"}) attached as
-suffix to attribute headings inherited from argument \code{y}}
+\item{suffix}{length 2 character vector (default \code{c(".x", ".y")}) attached as
+suffix to attribute headings inherited from argument \code{x} resp. from \code{y}}
 
 \item{suffix.all}{\code{TRUE} suffixes all attribute headings inherited from
-arguments \code{x} and \code{y} according to \code{x.suffix}, resp.
-\code{y.suffix}; \code{FALSE} (default) suffixes only homonymous attribute
-headings.}
+arguments \code{x} and \code{y} according to \code{suffix}; \code{FALSE} (default)
+suffixes only homonymous attribute headings.}
 
 \item{check_overlap}{\code{TRUE} detects those geometries included in
 \code{x} and \code{y} which overlap with the other input layer and applies
@@ -107,11 +102,11 @@ st_agr(poly_1) <- "constant"
 st_agr(poly_2) <- "constant"
 
 # Give customized suffixes to homonymous attributes of layers x and y:
-st_or(poly_1, poly_2, x.suffix = "_poly_1", y.suffix = "_poly_2") \%>\% plot()
+st_or(poly_1, poly_2, suffix = c("_poly_1", "_poly_2")) \%>\% plot()
 
 # If only homonymous attributes from one layer should get a suffix, set ...
 # ... the suffix for the other layer to an empty string:
-st_or(poly_1, poly_2, x.suffix = "") \%>\% names()
+st_or(poly_1, poly_2, suffix = c("", ".y")) \%>\% names()
 
 # If all attributes attributes of both layers x and y should get a
 # ... layer-specific suffix, set suffix.all = TRUE:
@@ -119,7 +114,7 @@ st_or(poly_1, poly_2, suffix.all = TRUE) \%>\% names()
 
 # If only all attributes from one layer should get a suffix, set the suffix ...
 # ... for the other layer to an empty string and set suffix.all = TRUE:
-st_or(poly_1, poly_2, x.suffix = "", suffix.all = TRUE) \%>\% names()
+st_or(poly_1, poly_2, suffix = c("", ".y"), suffix.all = TRUE) \%>\% names()
 
 # create two layers with overlapping linestrings:
 ls1 <- st_linestring(cbind(c(0, 1, 1, 0), c(0:3)))

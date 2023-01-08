@@ -35,16 +35,17 @@ test_that("test-st_or", {
   expect_error(st_or(poly_1, poly_2, dim = list(1)), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
   expect_error(st_or(poly_1, poly_2, dim = factor(1)), "dim must be a single integer or vector of integers consisting of 0, 1 and/or 2")
 
-  expect_error(st_or(poly_1, poly_2, x.suffix = "same_name", y.suffix = "same_name"))
-  # The arguments ‘x.suffix’ and ‘y.suffix’ are specified both with "same_name". But they need to be specified differently.
+  expect_error(st_or(poly_1, poly_2, suffix = c("same_name", "same_name")))
+  # The 1st and 2nd element of the argument ‘suffix’ are both specified as "same_name". But they need to be specified differently.
 
   expect_error(
-    st_or(poly_1, poly_2, x.suffix = 1),
-    "the argument x.suffix must be a single character string"
+    st_or(poly_1, poly_2, suffix = 1),
+    "the argument suffix must be a length 2 character vector"
   )
+
   expect_error(
-    st_or(poly_1, poly_2, y.suffix = c("A", "B")),
-    "the argument y.suffix must be a single character string"
+    st_or(poly_1, poly_2, suffix = list("A", "B")),
+    "the argument suffix must be a length 2 character vector"
   )
 
   expect_error(

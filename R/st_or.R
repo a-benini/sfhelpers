@@ -5,14 +5,11 @@
 #' @param dim integer: A combination of 0, 1, and/or 2 (default) that constrains
 #' the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
 #' surfaces.
-#' @param x.suffix a single character string (default \code{".x"}) attached as
-#' suffix to attribute headings inherited from argument \code{x}
-#' @param y.suffix a single character string (default \code{".y"}) attached as
-#' suffix to attribute headings inherited from argument \code{y}
+#' @param suffix length 2 character vector (default \code{c(".x", ".y")}) attached as
+#' suffix to attribute headings inherited from argument \code{x} resp. from \code{y}
 #' @param suffix.all \code{TRUE} suffixes all attribute headings inherited from
-#' arguments \code{x} and \code{y} according to \code{x.suffix}, resp.
-#' \code{y.suffix}; \code{FALSE} (default) suffixes only homonymous attribute
-#' headings.
+#' arguments \code{x} and \code{y} according to \code{suffix}; \code{FALSE} (default)
+#' suffixes only homonymous attribute headings.
 #' @param check_overlap \code{TRUE} detects those geometries included in
 #' \code{x} and \code{y} which overlap with the other input layer and applies
 #' geometric operations only on these; \code{FALSE} (default) applies geometric
@@ -83,11 +80,11 @@
 #' st_agr(poly_2) <- "constant"
 #'
 #' # Give customized suffixes to homonymous attributes of layers x and y:
-#' st_or(poly_1, poly_2, x.suffix = "_poly_1", y.suffix = "_poly_2") %>% plot()
+#' st_or(poly_1, poly_2, suffix = c("_poly_1", "_poly_2")) %>% plot()
 #'
 #' # If only homonymous attributes from one layer should get a suffix, set ...
 #' # ... the suffix for the other layer to an empty string:
-#' st_or(poly_1, poly_2, x.suffix = "") %>% names()
+#' st_or(poly_1, poly_2, suffix = c("", ".y")) %>% names()
 #'
 #' # If all attributes attributes of both layers x and y should get a
 #' # ... layer-specific suffix, set suffix.all = TRUE:
@@ -95,7 +92,7 @@
 #'
 #' # If only all attributes from one layer should get a suffix, set the suffix ...
 #' # ... for the other layer to an empty string and set suffix.all = TRUE:
-#' st_or(poly_1, poly_2, x.suffix = "", suffix.all = TRUE) %>% names()
+#' st_or(poly_1, poly_2, suffix = c("", ".y"), suffix.all = TRUE) %>% names()
 #'
 #' # create two layers with overlapping linestrings:
 #' ls1 <- st_linestring(cbind(c(0, 1, 1, 0), c(0:3)))
@@ -129,7 +126,7 @@
 #'   st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
 #' )
 #' @export
-st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = FALSE, check_overlap = FALSE, use_st_combine = TRUE, ...) {
+st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, check_overlap = FALSE, use_st_combine = TRUE, ...) {
   # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message
   if (!inherits(x, c("sf", "sfc", "sfg"))) {
     stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
@@ -148,21 +145,17 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     stop("dim must be a single integer or vector of integers consisting of 0, 1 and/or 2", call. = FALSE)
   }
 
-  # check if x.suffix and y.suffix are single character strings
-  if (!(is.character(x.suffix) & length(x.suffix) == 1)) {
-    stop("the argument x.suffix must be a single character string", call. = FALSE)
+  # check if suffix is a length 2 character vector
+  if (!(is.character(suffix) & length(suffix) == 2)) {
+    stop("the argument suffix must be a length 2 character vector", call. = FALSE)
   }
 
-  if (!(is.character(y.suffix) & length(y.suffix) == 1)) {
-    stop("the argument y.suffix must be a single character string", call. = FALSE)
-  }
-
-  # if x.suffix and y.suffix are the same stop and throw an error message
-  if (x.suffix == y.suffix) {
+  # if both suffix-element are the same stop and throw an error message
+  if (suffix[1] == suffix[2]) {
     stop(
       paste0(
-        "The arguments ", sQuote("x.suffix"), " and ", sQuote("y.suffix"),
-        ' are specified both with "', x.suffix,
+        'The 1st and 2nd element of the argument ', sQuote("suffix"),
+        ' are both specified as "', suffix[1],
         '". But they need to be specified differently.'
       ),
       call. = TRUE
@@ -204,8 +197,8 @@ st_or <- function(x, y, dim = 2, x.suffix = ".x", y.suffix = ".y", suffix.all = 
     x_agr <- base::intersect(x_agr, y_agr)
     y_agr <- x_agr
   }
-  names(x) <- ifelse(names(x) %in% x_agr, paste0(names(x), x.suffix), names(x))
-  names(y) <- ifelse(names(y) %in% y_agr, paste0(names(y), y.suffix), names(y))
+  names(x) <- ifelse(names(x) %in% x_agr, paste0(names(x), suffix[1]), names(x))
+  names(y) <- ifelse(names(y) %in% y_agr, paste0(names(y), suffix[2]), names(y))
 
   # avoid getting repented warnings about non-constant attribute variables
   # assumed to be constant

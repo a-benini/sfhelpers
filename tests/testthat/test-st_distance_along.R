@@ -17,17 +17,17 @@ test_that("test-st_distance_along", {
   pts <- st_as_sf(data.frame(x = c(0, 3, 3, 10), y = c(0, 0, -3, -3)), coords = c("x", "y"))
 
   expect_equal(
-    st_distance_along(pts),
+    st_distance_along(pts) %>% unname(),
     c(0, 3, 6, 13)
   )
 
   expect_equal(
-    st_distance_along(pts[1:5, ]),
+    st_distance_along(pts[1:5, ]) %>% unname(),
     c(0, 3, 6, 13, NA)
   )
 
   expect_equal(
-    st_distance_along(pts[c(1, 2, 5, 3, 4), ]),
+    st_distance_along(pts[c(1, 2, 5, 3, 4), ]) %>% unname(),
     c(0, 3, rep(NA, 3))
   )
 

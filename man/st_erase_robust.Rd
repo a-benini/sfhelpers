@@ -4,7 +4,7 @@
 \alias{st_erase_robust}
 \title{Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}}
 \usage{
-st_erase_robust(x, y, check_overlap = FALSE, ...)
+st_erase_robust(x, y, check_overlap = FALSE, use_st_combine = TRUE, ...)
 }
 \arguments{
 \item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
@@ -15,6 +15,11 @@ st_erase_robust(x, y, check_overlap = FALSE, ...)
 \code{x} and \code{y} which overlap with the other input layer and applies
 geometric operations only on these; \code{FALSE} (default) applies geometric
 operations on all geometries (s. Details).}
+
+\item{use_st_combine}{\code{TRUE} (default) applies internally
+\code{st_union(st_combine())} to \code{y}; \code{FALSE} leaves out
+\code{\link[sf]{st_combine}} and only uses \code{\link[sf]{st_union}}, which
+might be slower, but more reliable (s. Details).}
 
 \item{...}{arguments passed on to \code{\link[s2]{s2_options}}}
 }
@@ -46,9 +51,13 @@ input are longlat degrees, setting \code{\link[sf]{sf_use_s2}} to
 \code{FALSE} can help to speed up \code{st_erase_robust()} (s.examples below).
 
 Note that with the recent versions of \code{sf} (>= 1.0-1), although
-\code{st_union(st_combine())} might very well return an invalid geometry,
-experience made so far shows that this has become less of an obstacle for
-further prepossessing with \code{\link[sf]{st_difference}}.
+\code{st_union(st_combine())} may very well return invalid geometries,
+experience made so far shows that this has become less of an obstacle to
+further prepossessing with \code{\link[sf]{st_difference}}. Nonetheless, sometimes
+the default internal use of \code{st_union(st_combine())} (\code{use_st_combine}
+= \code{TRUE}) results in an improper erase. By setting \code{use_st_combine}
+= \code{FALSE} applying only \code{st_union()} to \code{y} can be enforced,
+which erases more reliably, but at the cost of longer run time.
 
 In case of a significant proportion of non-overlapping geometries, setting
 \code{check_overlap} to \code{TRUE} can shorten run time. As the internal

@@ -83,6 +83,23 @@ test_that("test-st_erase_robust", {
     st_erase_robust(sfc1, sfc2, check_overlap = TRUE)
   )
   expect_true(all(seq_along(eq) == sort(unlist(eq))))
+
+  # ----------------------------------------------------------------------------
+  # argument use_st_combine
+  expect_error(
+    st_erase_robust(poly_1, poly_2, use_st_combine = c(TRUE, FALSE)),
+    "use_st_combine must be a single logical value: TRUE or FALSE"
+  )
+
+  expect_error(
+    st_erase_robust(poly_1, poly_2, use_st_combine = NA),
+    "use_st_combine must be a single logical value: TRUE or FALSE"
+  )
+
+  expect_equal(
+    st_erase_robust(poly_1, poly_2),
+    st_erase_robust(poly_1, poly_2, use_st_combine = FALSE)
+  )
   # ----------------------------------------------------------------------------
   # issues of sfhelpers version 0.0.0.9000 with st_erase_robust() /
   # sf::st_combine() / st::st_make_valid() / sf::sf_use_s2() fixed for

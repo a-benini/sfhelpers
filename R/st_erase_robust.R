@@ -6,6 +6,10 @@
 #' \code{x} and \code{y} which overlap with the other input layer and applies
 #' geometric operations only on these; \code{FALSE} (default) applies geometric
 #' operations on all geometries (s. Details).
+#' @param use_st_combine \code{TRUE} (default) applies internally
+#' \code{st_union(st_combine())} to \code{y}; \code{FALSE} leaves out
+#' \code{\link[sf]{st_combine}} and only uses \code{\link[sf]{st_union}}, which
+#' might be slower, but more reliable (s. Details).
 #' @param ... arguments passed on to \code{\link[s2]{s2_options}}
 #'
 #' @return Returns all parts of geometry set \code{x} not overlapped by
@@ -34,9 +38,13 @@
 #' \code{FALSE} can help to speed up \code{st_erase_robust()} (s.examples below).
 #'
 #' Note that with the recent versions of \code{sf} (>= 1.0-1), although
-#' \code{st_union(st_combine())} might very well return an invalid geometry,
-#' experience made so far shows that this has become less of an obstacle for
-#' further prepossessing with \code{\link[sf]{st_difference}}.
+#' \code{st_union(st_combine())} may very well return invalid geometries,
+#' experience made so far shows that this has become less of an obstacle to
+#' further prepossessing with \code{\link[sf]{st_difference}}. Nonetheless, sometimes
+#' the default internal use of \code{st_union(st_combine())} (\code{use_st_combine}
+#' = \code{TRUE}) results in an improper erase. By setting \code{use_st_combine}
+#' = \code{FALSE} applying only \code{st_union()} to \code{y} can be enforced,
+#' which erases more reliably, but at the cost of longer run time.
 #'
 #' In case of a significant proportion of non-overlapping geometries, setting
 #' \code{check_overlap} to \code{TRUE} can shorten run time. As the internal
@@ -99,7 +107,7 @@
 #' st_union(st_combine(nc))
 #' }
 #' @export
-st_erase_robust <- function(x, y, check_overlap = FALSE, ...) {
+st_erase_robust <- function(x, y, check_overlap = FALSE, use_st_combine = TRUE, ...) {
   # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message
   if (!inherits(x, c("sf", "sfc", "sfg"))) {
     stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
@@ -116,26 +124,33 @@ st_erase_robust <- function(x, y, check_overlap = FALSE, ...) {
     stop("check_overlap must be a single logical value: TRUE or FALSE", call. = FALSE)
   }
 
+  if (!isTRUE(use_st_combine) & !isFALSE(use_st_combine)) {
+    stop("use_st_combine must be a single logical value: TRUE or FALSE", call. = FALSE)
+  }
+
   if (check_overlap) { # apply geometric operations only to overlapping geometries
     y     <- sf::st_geometry(y)
     int   <- sf::st_intersects(x, y, ...)
     int_x <- lengths(int) > 0
     int_y <- unique(unlist(int))
     if (inherits(x, "sf") & !all(int_x)) {
-      rbind(st_erase(x[int_x, ], y[int_y], ...), x[!int_x, ])
+      rbind(st_erase(x[int_x, ], y[int_y], use_st_combine, ...), x[!int_x, ])
     } else if (inherits(x, "sfc")) {
-      c(st_erase(x[int_x], y[int_y], ...), x[!int_x])
+      c(st_erase(x[int_x], y[int_y], use_st_combine, ...), x[!int_x])
     } else { # if x is of class sfg or x is of class sf and all its geometries overlap with y
-      st_erase(x, y[int_y], ...)
+      st_erase(x, y[int_y], use_st_combine, ...)
     }
   } else { # apply geometric operations to all geometries
-    st_erase(x, y, ...)
+    st_erase(x, y, use_st_combine, ...)
   }
 }
 # helper function for pkg-internal use
-st_erase <- function(x, y, ...) {
-  default <- try(sf::st_difference(x, sf::st_union(sf::st_combine(y)), ...), silent = TRUE)
-  if (inherits(default, "try-error")) {
+st_erase <- function(x, y, use_st_combine, ...) {
+  if (use_st_combine) {
+    default <- try(sf::st_difference(x, sf::st_union(sf::st_combine(y)), ...), silent = TRUE)
+  }
+  if(!exists("default")){ default <- NULL }
+  if (inherits(default, "try-error") | !use_st_combine) {
     sf::st_difference(x, sf::st_union(y), ...)
   } else {
     default

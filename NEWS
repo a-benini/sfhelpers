@@ -1,3 +1,13 @@
+# version 0.0.0.9003
+* add function `st_distance_along()`.
+* add argument `use_st_combine` (default `TRUE`) to functions `st_erase_robust()`
+and `st_or()`. Setting `use_st_combine` to `FALSE` enforces internal use of
+`st_union()` instead of `st_union(st_combine())`. Leaving out `st_combine()` may
+make the erasing more reliable but also slower.
+* replace arguments `x.suffix` and `y.suffix` by argument `suffix` in function `st_or()`.
+* minor improvements of functions.
+* improved vignette and help pages.
+
 version 0.0.0.9002
 * `st_rename_geometry()` function has been superseded because with `sf` package
 version >= 1.0-6 `st_set_geometry()` offers the same functionality.

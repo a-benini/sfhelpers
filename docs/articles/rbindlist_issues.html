@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@ is a <a href="https://github.com/r-spatial/sf/issues/798#" class="external-link"
 alternative</a> to <code>do.call(rbind, &lt;list_of_sf&gt;)</code> for
 binding <code>list</code>s of simple features objects (<code>sf</code>)
 to single <code>sf</code>. However, there are some pitfalls when
-<code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> is applied to <code>list</code>s of
+<code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> is applied to <code>list</code>s of
 <code>sf</code>. These are explored, and some workarounds are
 presented.</p>
 </div>
@@ -123,154 +123,153 @@ presented.</p>
 <h2 id="packages-required">Packages required<a class="anchor" aria-label="anchor" href="#packages-required"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'dplyr'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     filter, lag</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'data.table'</span>
-<span class="co">#&gt; The following objects are masked from 'package:dplyr':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     between, first, last</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
-<span class="co">#&gt; Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1; sf_use_s2() is TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'data.table'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     between, first, last</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1; sf_use_s2() is TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="compare-rbindlist-and-do-call">Compare <code>rbindlist()</code> and <code>do.call()</code><a class="anchor" aria-label="anchor" href="#compare-rbindlist-and-do-call"></a>
+<h2 id="compare-rbindlist-and-do-callrbind">Compare <code>rbindlist()</code> and
+<code>do.call(rbind, )</code><a class="anchor" aria-label="anchor" href="#compare-rbindlist-and-do-callrbind"></a>
 </h2>
 <div class="section level3">
 <h3 id="inherited-classes-and-bbox">Inherited classes and <code>bbox</code><a class="anchor" aria-label="anchor" href="#inherited-classes-and-bbox"></a>
 </h3>
 <p>We create a <code>list</code> of <code>sf</code> objects:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"gpkg/nc.gpkg"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="op">]</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"gpkg/nc.gpkg"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>Binding such a <code>list</code> of <code>sf</code> with
-<code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> to a single <code>sf</code> object works easily
-(as long as the <code>list</code> is rather small):</p>
+<code>do.call(rbind, )</code> to a single <code>sf</code> object works
+easily (as long as the <code>list</code> is rather small):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nc_do.call</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">list_of_sf</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">nc_rbind</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">list_of_sf</span><span class="op">)</span></span></code></pre></div>
 <p>And will return the expected object of the class <code>sf</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/all.equal.data.table.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_do.call</span>, <span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
-<p>What’s different when <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> is used instead of
-<code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code>?</p>
-<p>First of all, <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> on its own does not bind a
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbind</span>, <span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>What’s different when <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> is used instead of
+<code>do.call(rbind, )</code>?</p>
+<p>First of all, <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> on its own does not bind a
 <code>list</code> of <code>sf</code> to an object of the class
 <code>sf</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "data.table" "data.frame"</span></code></pre></div>
-<p>Thus, subsequently the return of <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> needs to be
+<code class="sourceCode R"><span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "data.table" "data.frame"</span></span></code></pre></div>
+<p>Thus, subsequently the return of <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> needs to be
 converted into an object of the the class <code>sf</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nc_rbindlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">nc_rbindlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Is the return of the pipe <code>rbindlist() %&gt;% st_as_sf()</code>
-equivalent to the one of <code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code>?</p>
+equivalent to the one of <code>do.call(rbind, )</code>?</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/all.equal.data.table.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] "target is data.table, current is sf"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "target is data.table, current is sf"</span></span></code></pre></div>
 <p>No, not really! The pipe-output has inherited the class
 <code>data.table</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] "sf"         "data.frame"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span>
-<span class="co">#&gt; [1] "sf"         "data.table" "data.frame"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sf"         "data.frame"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sf"         "data.table" "data.frame"</span></span></code></pre></div>
 <p>Will omitting the class <code>data.table</code> eliminate the
 difference?</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sf"</span>, <span class="st">"data.frame"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/data.table/man/all.equal.data.table.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] "Component \"geom\": Attributes: &lt; Component \"bbox\": Mean relative difference: 0.05380136 &gt;"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sf"</span>, <span class="st">"data.frame"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Component \"geom\": Attributes: &lt; Component \"bbox\": Mean relative difference: 0.05380136 &gt;"</span></span></code></pre></div>
 <p>There’s also an issue with <code>bbox</code> of the geometry
 column:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt;  xmin  ymin  xmax  ymax </span>
-<span class="co">#&gt; FALSE FALSE FALSE  TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  xmin  ymin  xmax  ymax </span></span>
+<span><span class="co">#&gt; FALSE FALSE FALSE  TRUE</span></span></code></pre></div>
 <p>Instead of returning the correct <code>bbox</code> for the whole
-geometry column, <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">data.table::rbindlist()</a></code> simply copies the
+geometry column, <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">data.table::rbindlist()</a></code> simply copies the
 <code>bbox</code> of the first <code>list</code>ed <code>sf</code>
 object:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-<span class="co">#&gt; xmin ymin xmax ymax </span>
-<span class="co">#&gt; TRUE TRUE TRUE TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; xmin ymin xmax ymax </span></span>
+<span><span class="co">#&gt; TRUE TRUE TRUE TRUE</span></span></code></pre></div>
 <p>A <a href="https://github.com/Rdatatable/data.table/issues/4681" class="external-link">simple
 trick</a> solves this issue inherent to <code>sf</code>-objects compiled
-with <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">data.table::rbindlist()</a></code>:</p>
+with <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">data.table::rbindlist()</a></code>:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_former_dt</span> <span class="op">&lt;-</span> <span class="va">sf_former_dt</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_former_dt</span><span class="op">)</span>, <span class="op">]</span>
-<span class="co"># or, preferable in a programming context:</span>
-<span class="va">sf_former_dt</span> <span class="op">&lt;-</span> <span class="va">sf_former_dt</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_former_dt</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sf_former_dt</span> <span class="op">&lt;-</span> <span class="va">sf_former_dt</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_former_dt</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="co"># or, preferable in a programming context:</span></span>
+<span><span class="va">sf_former_dt</span> <span class="op">&lt;-</span> <span class="va">sf_former_dt</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_former_dt</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <p>We apply the trick …</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nc_rbindlist</span> <span class="op">&lt;-</span> <span class="va">nc_rbindlist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">nc_rbindlist</span> <span class="op">&lt;-</span> <span class="va">nc_rbindlist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc_rbindlist</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <p>… check if it worked:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/all.equal.data.table.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc_rbindlist</span>, <span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="crs">CRS<a class="anchor" aria-label="anchor" href="#crs"></a>
 </h3>
 <p><code>list</code>s containing <code>sf</code>-objects with different
-CRS are treated quite differently by <code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> and
+CRS are treated quite differently by <code>do.call(rbind, )</code> and
 <code>rbindlist() %&gt;% st_as_sf()</code>. To demonstrate that, we
 create such a <code>list</code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"gpkg/nc.gpkg"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="va">nc_3857</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">nc</span>, <span class="fl">3857</span><span class="op">)</span>
-
-<span class="va">list_of_sf_with_unequal_crs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span>, <span class="va">nc_3857</span><span class="op">)</span></code></pre></div>
-<p><code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> does not bind a <code>list</code> of
-<code>sf</code>-objects with unequal CRS and throws a corresponding
-error-message:</p>
+<code class="sourceCode R"><span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"gpkg/nc.gpkg"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">nc_3857</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">nc</span>, <span class="fl">3857</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">list_of_sf_with_unequal_crs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span>, <span class="va">nc_3857</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind()</a></code> does not bind <code>sf</code>-objects with
+unequal CRS and throws a corresponding error-message:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">list_of_sf_with_unequal_crs</span><span class="op">)</span>
-<span class="co">#&gt; Error: arguments have different crs</span></code></pre></div>
-<p>Whereas the pipe <code>rbindlist() %&gt;% st_as_sf</code> doesn’t
-seem to be affected:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">list_of_sf_with_unequal_crs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: arguments have different crs</span></span></code></pre></div>
+<p>Whereas <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> doesn’t seem to be affected:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_dt</span> <span class="op">&lt;-</span> <span class="va">list_of_sf_with_unequal_crs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sf_dt</span> <span class="op">&lt;-</span> <span class="va">list_of_sf_with_unequal_crs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The returned object of the classes <code>sf</code> and
 <code>data.table</code> has a CRS which is the same as the one of first
 <code>list</code>ed <code>sf</code>-object:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span>
-<span class="co">#&gt; [1] 4267</span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span></span>
+<span><span class="co">#&gt; [1] 4267</span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>If we reverse the sequence of elements of the <code>list</code> of
 <code>sf</code>-objects with unequal CRS the newly first placed
 <code>sf</code>-object dictates the CRS of the by
 <code>rbindlist() %&gt;% st_as_sf</code> bound single
 <code>sf</code>-object:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_dt</span> <span class="op">&lt;-</span> <span class="va">list_of_sf_with_unequal_crs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span>
-<span class="co">#&gt; [1] 3857</span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">nc_3857</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
-<p>The maloperation of <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> regarding
+<code class="sourceCode R"><span><span class="va">sf_dt</span> <span class="op">&lt;-</span> <span class="va">list_of_sf_with_unequal_crs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span></span>
+<span><span class="co">#&gt; [1] 3857</span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">sf_dt</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">nc_3857</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>The maloperation of <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> regarding
 <code>list</code>s of <code>sf</code>-objects with different CRS can’t
 be handled after the fact. Thus, feeding such a <code>list</code> to
-<code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> must be avoided. Hence prior checking if a
+<code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> must be avoided. Hence prior checking if a
 <code>list</code> of <code>sf</code> contains more than 1 CRS is
 crucial:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span>, <span class="va">nc_3857</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">st_crs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] 2</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span>, <span class="va">nc_3857</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">st_crs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="different-geometry_types">Different <code>geometry_type</code>s<a class="anchor" aria-label="anchor" href="#different-geometry_types"></a>
@@ -278,106 +277,107 @@ crucial:</p>
 <p>A <code>list</code> with <code>sf</code>-objects having geometry
 columns of different <code>geometry_type</code>s:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">l_diff_geom_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">17</span>, <span class="fl">56</span><span class="op">)</span>, <span class="op">]</span>, <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_cast.html" class="external-link">st_cast</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span>, <span class="st">"POLYGON"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/duplicated.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] MULTIPOLYGON POLYGON     </span>
-<span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></code></pre></div>
-<p><code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> can easily stack such a <code>list</code> and
-the returned <code>geometry_type</code> is <code>GEOMETRY</code>:</p>
+<code class="sourceCode R"><span><span class="va">l_diff_geom_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">17</span>, <span class="fl">56</span><span class="op">)</span>, <span class="op">]</span>, <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_cast.html" class="external-link">st_cast</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span>, <span class="st">"POLYGON"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] MULTIPOLYGON POLYGON     </span></span>
+<span><span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind()</a></code> can easily stack <code>sf</code>-objects with
+geometry columns of different <code>geometry_type</code>s and the
+returned <code>geometry_type</code> is <code>GEOMETRY</code>:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_do.call</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">l_diff_geom_type</span><span class="op">)</span>
-
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry_type.html" class="external-link">st_geometry_type</a></span><span class="op">(</span><span class="va">sf_do.call</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; [1] GEOMETRY</span>
-<span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></code></pre></div>
-<p>But <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> can’t handle a <code>list</code>
+<code class="sourceCode R"><span><span class="va">sf_do.call</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">l_diff_geom_type</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry_type.html" class="external-link">st_geometry_type</a></span><span class="op">(</span><span class="va">sf_do.call</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] GEOMETRY</span></span>
+<span><span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></span></code></pre></div>
+<p>But <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> can’t handle a <code>list</code>
 containing different <code>geometry_type</code>s:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span><span class="op">)</span>
-<span class="co">#&gt; Error in rbindlist(l_diff_geom_type): Class attribute on column 15 of item 2 does not match with column 15 of item 1.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in rbindlist(l_diff_geom_type): Class attribute on column 15 of item 2 does not match with column 15 of item 1.</span></span></code></pre></div>
 <p><a name="slow_method"></a> In order to make such a <code>list</code>
-workable for <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code>, the <code>geometry_type</code>s
+workable for <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code>, the <code>geometry_type</code>s
 have to be homogenized:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">l_homogenized_geom_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span>, <span class="va">st_cast</span>, to <span class="op">=</span> <span class="st">"GEOMETRY"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/duplicated.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] GEOMETRY</span>
-<span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">l_homogenized_geom_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">l_diff_geom_type</span>, <span class="va">st_cast</span>, to <span class="op">=</span> <span class="st">"GEOMETRY"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] GEOMETRY</span></span>
+<span><span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></span></code></pre></div>
 <p>Once the <code>list</code>ed <code>sf</code>-objects have the same
-<code>geometry_type</code>, <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist()</a></code> can stack them:</p>
+<code>geometry_type</code>, <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist()</a></code> can stack them:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_rbindlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry_type.html" class="external-link">st_geometry_type</a></span><span class="op">(</span><span class="va">sf_rbindlist</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; [1] GEOMETRY</span>
-<span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sf_rbindlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry_type.html" class="external-link">st_geometry_type</a></span><span class="op">(</span><span class="va">sf_rbindlist</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] GEOMETRY</span></span>
+<span><span class="co">#&gt; 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE</span></span></code></pre></div>
 <p>Note that the <a href="#slow_method">above demonstrated way</a> of
 homogenizing <code>geometry_type</code>s isn’t very time efficient for
 large <code>list</code>s of <code>sf</code>-objects. Luckily there’s a
 faster alternative:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">l</span> <span class="op">&lt;-</span> <span class="va">l_diff_geom_type</span> <span class="co"># for the sake of code readability, copy list as short-named object</span>
-
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="st">"sf_column"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"sfc_GEOMETRY"</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="va">l_diff_geom_type</span> <span class="co"># for the sake of code readability, copy list as short-named object</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="st">"sf_column"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"sfc_GEOMETRY"</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>We check if the two homogenizing methods are equivalent:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/all.equal.data.table.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span>, <span class="va">l</span><span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">l_homogenized_geom_type</span>, <span class="va">l</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="conclusions">Conclusions<a class="anchor" aria-label="anchor" href="#conclusions"></a>
 </h2>
-<p>The use of <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">data.table::rbindlist()</a></code> as a fast alternative
-to <code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> for binding <code>list</code>s of
+<p>The use of <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">data.table::rbindlist()</a></code> as a fast alternative
+to <code>do.call(rbind, )</code> for binding <code>list</code>s of
 <code>sf</code>-objects to a single <code>sf</code>-object is justified
-in situations when <code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code> is too slow. It does, however,
-require appropriate pre- and post-treatment:</p>
+in situations when <code>do.call(rbind, )</code> is too slow. It does,
+however, require appropriate pre- and post-treatment:</p>
 <ol style="list-style-type: decimal">
 <li>Check if a <code>list</code> of <code>sf</code>-objects contains
 more than 1 distinct CRS:</li>
 </ol>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">list_of_sf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">st_crs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">list_of_sf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">st_crs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>If so, CRS-unification needs to be done before moving on.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">?</span><span class="va">st_transform</span>
-<span class="op">?</span><span class="va">st_crs</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">?</span><span class="va">st_transform</span></span>
+<span><span class="op">?</span><span class="va">st_crs</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Check if the <code>list</code>ed <code>sf</code>-objects have
 different <code>geometry_type</code>s:</li>
 </ol>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">list_of_sf</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/duplicated.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">list_of_sf</span>, <span class="va">st_geometry_type</span>, by_geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>If so, homogenize them:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">list_of_sf</span>, <span class="va">st_cast</span>, to <span class="op">=</span> <span class="st">"GEOMETRY"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co"># or more advisable because faster (for large lists):</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="st">"sf_column"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"sfc_GEOMETRY"</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">list_of_sf</span>, <span class="va">st_cast</span>, to <span class="op">=</span> <span class="st">"GEOMETRY"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co"># or more advisable because faster (for large lists):</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, <span class="st">"sf_column"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"sfc_GEOMETRY"</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Bind <code>list</code> of <code>sf</code>-objects to a single
 <code>sf</code>-object (which is also a <code>data.table</code>):</li>
 </ol>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">list_of_sf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sf_object</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">list_of_sf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sf_object</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Fix bounding box / <code>bbox</code>:</li>
 </ol>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sf_object</span> <span class="op">&lt;-</span> <span class="va">sf_object</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span>, <span class="op">]</span>
-<span class="co"># or, preferable in a programming context:</span>
-<span class="va">sf_object</span> <span class="op">&lt;-</span> <span class="va">sf_object</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sf_object</span> <span class="op">&lt;-</span> <span class="va">sf_object</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="co"># or, preferable in a programming context:</span></span>
+<span><span class="va">sf_object</span> <span class="op">&lt;-</span> <span class="va">sf_object</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>If required, omit class <code>data.table</code>:</li>
 </ol>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sf"</span>, <span class="st">"data.frame"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sf_object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sf"</span>, <span class="st">"data.frame"</span><span class="op">)</span></span></code></pre></div>
 <p>Note that those five steps are integrated in the function
 <code><a href="../reference/st_rbindlist.html">sfhelpers::st_rbindlist()</a></code> enabling a painless and fast
 conversion of a <code>list</code> of <code>sf</code> objects to a single
@@ -386,7 +386,7 @@ argument options capable of handling <code>list</code>s of
 <code>sf</code> objects that differ by the names and positions of their
 geometry and other attribute columns.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">?</span><span class="fu">sfhelpers</span><span class="fu">::</span><span class="va"><a href="../reference/st_rbindlist.html">st_rbindlist</a></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">?</span><span class="fu">sfhelpers</span><span class="fu">::</span><span class="va"><a href="../reference/st_rbindlist.html">st_rbindlist</a></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="links">Links<a class="anchor" aria-label="anchor" href="#links"></a>
@@ -419,8 +419,7 @@ handling in combine_list_of_sf</a></p></li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

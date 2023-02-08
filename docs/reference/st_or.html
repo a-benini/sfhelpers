@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
       </span>
     </div>
 
@@ -80,50 +80,68 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">st_or</span><span class="op">(</span>
-  <span class="va">x</span>,
-  <span class="va">y</span>,
-  dim <span class="op">=</span> <span class="fl">2</span>,
-  x.suffix <span class="op">=</span> <span class="st">".x"</span>,
-  y.suffix <span class="op">=</span> <span class="st">".y"</span>,
-  suffix.all <span class="op">=</span> <span class="cn">FALSE</span>,
-  check_overlap <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_or</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  dim <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".x"</span>, <span class="st">".y"</span><span class="op">)</span>,</span>
+<span>  suffix.all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  check_overlap <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_st_combine <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>object of class <code>sf</code>, <code>sfc</code> or <code>sfg</code></p></dd>
+
+
 <dt>y</dt>
 <dd><p>object of class <code>sf</code>, <code>sfc</code> or <code>sfg</code></p></dd>
+
+
 <dt>dim</dt>
 <dd><p>integer: A combination of 0, 1, and/or 2 (default) that constrains
 the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
 surfaces.</p></dd>
-<dt>x.suffix</dt>
-<dd><p>a single character string (default <code>".x"</code>) attached as
-suffix to attribute headings inherited from argument <code>x</code></p></dd>
-<dt>y.suffix</dt>
-<dd><p>a single character string (default <code>".y"</code>) attached as
-suffix to attribute headings inherited from argument <code>y</code></p></dd>
+
+
+<dt>suffix</dt>
+<dd><p>length 2 character vector (default <code>c(".x", ".y")</code>) attached as
+suffix to attribute headings inherited from argument <code>x</code> resp. from <code>y</code></p></dd>
+
+
 <dt>suffix.all</dt>
 <dd><p><code>TRUE</code> suffixes all attribute headings inherited from
-arguments <code>x</code> and <code>y</code> according to <code>x.suffix</code>, resp.
-<code>y.suffix</code>; <code>FALSE</code> (default) suffixes only homonymous attribute
-headings.</p></dd>
+arguments <code>x</code> and <code>y</code> according to <code>suffix</code>; <code>FALSE</code> (default)
+suffixes only homonymous attribute headings.</p></dd>
+
+
 <dt>check_overlap</dt>
 <dd><p><code>TRUE</code> detects those geometries included in
 <code>x</code> and <code>y</code> which overlap with the other input layer and applies
 geometric operations only on these; <code>FALSE</code> (default) applies geometric
 operations on all geometries (s. Details).</p></dd>
+
+
+<dt>use_st_combine</dt>
+<dd><p><code>TRUE</code> (default) applies internally
+<code>st_union(st_combine())</code> to <code>x</code> and <code>y</code>; <code>FALSE</code> leaves out
+<code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></code> and only uses <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></code>, which
+might be slower, but more reliable (s. Details of <code><a href="st_erase_robust.html">st_erase_robust</a></code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed on to <code><a href="https://r-spatial.github.io/s2/reference/s2_options.html" class="external-link">s2_options</a></code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>geometry set containing the intersection of <code>x</code> and <code>y</code> and
+    
+
+<p>geometry set containing the intersection of <code>x</code> and <code>y</code> and
 the non-overlapping parts of <code>x</code> and <code>y</code>. The attribute table is
 filled with attribute values from the respective original geometry set for
 non-overlapping features, and attribute values from both geometry sets for
@@ -164,12 +182,12 @@ this see details and examples sections of <code><a href="st_erase_robust.html">s
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:terra’:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, src, union</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, union</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:raster’:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, select, union</span>
@@ -179,13 +197,13 @@ this see details and examples sections of <code><a href="st_erase_robust.html">s
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>attribute variables are assumed to be spatially constant throughout all geometries</span>
 <span class="r-plt img"><img src="st_or-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>attribute variables are assumed to be spatially constant throughout all geometries</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     A.x  B    C  A.y  D    E</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    Pq  1 1983    z 48 2015</span>
@@ -203,70 +221,70 @@ this see details and examples sections of <code><a href="st_erase_robust.html">s
 <span class="r-out co"><span class="r-pr">#&gt;</span> 13 &lt;NA&gt; NA   NA    z 48 2015</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14 &lt;NA&gt; NA   NA    y 36 2016</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15 &lt;NA&gt; NA   NA    x 24 2017</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># to avoid repeated warning messages triggered by non-spatially constant ...</span></span>
-<span class="r-in"><span class="co"># ... attribute variables, set them all to "constant":</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Give customized suffixes to homonymous attributes of layers x and y:</span></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, x.suffix <span class="op">=</span> <span class="st">"_poly_1"</span>, y.suffix <span class="op">=</span> <span class="st">"_poly_2"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># to avoid repeated warning messages triggered by non-spatially constant ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... attribute variables, set them all to "constant":</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_agr.html" class="external-link">st_agr</a></span><span class="op">(</span><span class="va">poly_2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Give customized suffixes to homonymous attributes of layers x and y:</span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"_poly_1"</span>, <span class="st">"_poly_2"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="st_or-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># If only homonymous attributes from one layer should get a suffix, set ...</span></span>
-<span class="r-in"><span class="co"># ... the suffix for the other layer to an empty string:</span></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, x.suffix <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># If only homonymous attributes from one layer should get a suffix, set ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... the suffix for the other layer to an empty string:</span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">".y"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A"        "B"        "C"        "A.y"      "D"        "E"        "geometry"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># If all attributes attributes of both layers x and y should get a</span></span>
-<span class="r-in"><span class="co"># ... layer-specific suffix, set suffix.all = TRUE:</span></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, suffix.all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># If all attributes attributes of both layers x and y should get a</span></span></span>
+<span class="r-in"><span><span class="co"># ... layer-specific suffix, set suffix.all = TRUE:</span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, suffix.all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A.x"      "B.x"      "C.x"      "A.y"      "D.y"      "E.y"      "geometry"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># If only all attributes from one layer should get a suffix, set the suffix ...</span></span>
-<span class="r-in"><span class="co"># ... for the other layer to an empty string and set suffix.all = TRUE:</span></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, x.suffix <span class="op">=</span> <span class="st">""</span>, suffix.all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># If only all attributes from one layer should get a suffix, set the suffix ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... for the other layer to an empty string and set suffix.all = TRUE:</span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">".y"</span><span class="op">)</span>, suffix.all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A"        "B"        "C"        "A.y"      "D.y"      "E.y"      "geometry"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># create two layers with overlapping linestrings:</span></span>
-<span class="r-in"><span class="va">ls1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">ls2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">ls3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">st_sf</a></span><span class="op">(</span>id_A <span class="op">=</span> <span class="fl">1</span>, A <span class="op">=</span> <span class="st">"A"</span>, geom <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span><span class="va">ls1</span><span class="op">)</span>, agr <span class="op">=</span> <span class="st">"constant"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">st_sf</a></span><span class="op">(</span>id_B <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, B <span class="op">=</span> <span class="st">"B"</span>, geom <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span><span class="va">ls2</span>, <span class="va">ls3</span><span class="op">)</span>, agr <span class="op">=</span> <span class="st">"constant"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"gray"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, extent <span class="op">=</span> <span class="fu"><a href="st_bbox_common.html">st_bbox_common</a></span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"right"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gray"</span>, <span class="st">"red"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># create two layers with overlapping linestrings:</span></span></span>
+<span class="r-in"><span><span class="va">ls1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ls2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ls3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">st_sf</a></span><span class="op">(</span>id_A <span class="op">=</span> <span class="fl">1</span>, A <span class="op">=</span> <span class="st">"A"</span>, geom <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span><span class="va">ls1</span><span class="op">)</span>, agr <span class="op">=</span> <span class="st">"constant"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">st_sf</a></span><span class="op">(</span>id_B <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, B <span class="op">=</span> <span class="st">"B"</span>, geom <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span><span class="va">ls2</span>, <span class="va">ls3</span><span class="op">)</span>, agr <span class="op">=</span> <span class="st">"constant"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"gray"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, extent <span class="op">=</span> <span class="fu"><a href="st_bbox_common.html">st_bbox_common</a></span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"right"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gray"</span>, <span class="st">"red"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="st_or-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># when both input layers consist of linestings, and if the default specification ...</span></span>
-<span class="r-in"><span class="co"># ... dim = 2 (for surfaces / (multi)polygons) is used, a sf-object with zero ...</span></span>
-<span class="r-in"><span class="co"># ... rows will be returned:</span></span>
-<span class="r-in"><span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># when both input layers consist of linestings, and if the default specification ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... dim = 2 (for surfaces / (multi)polygons) is used, a sf-object with zero ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... rows will be returned:</span></span></span>
+<span class="r-in"><span><span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 0 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: NA ymin: NA xmax: NA ymax: NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CRS:           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] id_A A    id_B B    geom</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># to get lines returned set dim = 1:</span></span>
-<span class="r-in"><span class="va">comb_dim_1</span> <span class="op">&lt;-</span> <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>comb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, <span class="st">"B"</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, <span class="st">"A"</span>, <span class="st">"A+B"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">comb_dim_1</span><span class="op">[</span>, <span class="st">"comb"</span><span class="op">]</span>, lwd <span class="op">=</span> <span class="fl">3</span>, key.pos <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"dim = 1: only lines"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># to get lines returned set dim = 1:</span></span></span>
+<span class="r-in"><span><span class="va">comb_dim_1</span> <span class="op">&lt;-</span> <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>comb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, <span class="st">"B"</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, <span class="st">"A"</span>, <span class="st">"A+B"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">comb_dim_1</span><span class="op">[</span>, <span class="st">"comb"</span><span class="op">]</span>, lwd <span class="op">=</span> <span class="fl">3</span>, key.pos <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"dim = 1: only lines"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="st_or-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># for returning lines and points where lines cross or touch lines of the other ...</span></span>
-<span class="r-in"><span class="co"># ... input layer, set dim = c(0, 1):</span></span>
-<span class="r-in"><span class="va">comb_dim_0_1</span> <span class="op">&lt;-</span> <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>comb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, <span class="st">"B"</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, <span class="st">"A"</span>, <span class="st">"A+B"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">comb_dim_0_1</span><span class="op">[</span>, <span class="st">"comb"</span><span class="op">]</span>, lwd <span class="op">=</span> <span class="fl">3</span>, cex <span class="op">=</span> <span class="fl">2</span>, key.pos <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"dim = c(0, 1): points &amp; lines"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># for returning lines and points where lines cross or touch lines of the other ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... input layer, set dim = c(0, 1):</span></span></span>
+<span class="r-in"><span><span class="va">comb_dim_0_1</span> <span class="op">&lt;-</span> <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>comb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span>, <span class="st">"B"</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span>, <span class="st">"A"</span>, <span class="st">"A+B"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">comb_dim_0_1</span><span class="op">[</span>, <span class="st">"comb"</span><span class="op">]</span>, lwd <span class="op">=</span> <span class="fl">3</span>, cex <span class="op">=</span> <span class="fl">2</span>, key.pos <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"dim = c(0, 1): points &amp; lines"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="st_or-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="co"># returns points &amp; lines</span></span>
-<span class="r-in">  <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># returns points, lines (&amp; if available surfaces)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, <span class="co"># returns points &amp; lines</span></span></span>
+<span class="r-in"><span>  <span class="fu">st_or</span><span class="op">(</span><span class="va">A</span>, <span class="va">B</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># returns points, lines (&amp; if available surfaces)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
@@ -282,8 +300,7 @@ this see details and examples sections of <code><a href="st_erase_robust.html">s
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

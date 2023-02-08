@@ -65,8 +65,8 @@ st_agr(poly_2)
 
 # st_or() suffixes by default originally identically named attribute columns
 st_or(x = poly_1, y = poly_2) %>% st_drop_geometry()
-#> Warning: attribute variables are assumed to be spatially constant throughout all
-#> geometries
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
 #>     A.x  B    C  A.y  D    E
 #> 1    Pq  1 1983    z 48 2015
 #> 2    Pq  1 1983    y 36 2016
@@ -85,8 +85,8 @@ st_or(x = poly_1, y = poly_2) %>% st_drop_geometry()
 #> 15 <NA> NA   NA    x 24 2017
 
 st_or(poly_1, poly_2) %>% plot()
-#> Warning: attribute variables are assumed to be spatially constant throughout all
-#> geometries
+#> Warning: attribute variables are assumed to be spatially constant throughout
+#> all geometries
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />

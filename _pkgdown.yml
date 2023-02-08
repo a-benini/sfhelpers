@@ -10,6 +10,7 @@ reference:
       - st_bbox_common
       - st_bbox_list
       - st_disaggregate
+      - st_distance_along
       - st_erase_robust
       - st_or
       - st_rbindlist

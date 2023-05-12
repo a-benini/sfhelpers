@@ -29,25 +29,25 @@ library(sf)
 library(sp)
 library(raster)
 library(stars)
+library(terra)
 nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 
 # create spatial objects of different classes and extent:
 sf    <- nc[4:8, ]
 sp    <- sf::as_Spatial(nc[96:100, ])
-logo  <- raster(system.file("external/rlogo.grd", package = "raster"))
-ext   <- extent(-77.5, -76, 33, 34.5)
-r     <- raster(nrows = nrow(logo), ncols = ncol(logo), ext = ext)
-r[]   <- logo[]
-stars <- st_as_stars(r) \%>\% st_set_crs(st_crs(sf))
-r     <- as(stars, "Raster") \%>\% setExtent(ext = ext + rep(1.5, 4))
+logo  <- raster(system.file("external/rlogo.grd", package = "raster")) \%>\% as.matrix()
+rast  <- rast(logo, extent = c(-77.5, -76, 33, 34.5), crs = st_crs(sf)$wkt)
+stars <- st_as_stars(rast) \%>\% st_set_bbox(., st_bbox(.) + rep(c(1.5, 0), 2)) \%>\% st_flip()
+r     <- raster(rast) \%>\% setExtent(., extent(.) + rep(1.5, 4))
 
 # common extent / bbox:
-(bbox_common <- st_bbox_common(sf, sp, r, stars))
+(bbox_common <- st_bbox_common(sf, sp, rast, stars, r))
 
 # map objects within their common extent:
 library(tmap)
-tm_shape(r, bbox = bbox_common) + tm_raster(title = "r", style = "cont") +
+tm_shape(rast, bbox = bbox_common) + tm_raster(title = "rast", style = "cont") +
   tm_shape(stars) + tm_raster(title = "stars", style = "cont", palette = "viridis") +
+  tm_shape(r) + tm_raster(title = "r", style = "cont", palette = "Spectral") +
   tm_shape(sf) + tm_borders() +
   tm_shape(sp) + tm_borders(col = "red")
 
@@ -58,19 +58,4 @@ st_bbox_list(l)
 # the bbox of the original geometry set (nc) and the bbox of its listed objects are identical:
 all.equal(st_bbox_list(l), st_bbox(nc))
 
-# map objects of classes from terra pkg
-library(terra)
-rast <- rast(r)  # class SpatRaster
-vect <- vect(sf) # class SpatVector
-
-bbox_common <- st_bbox_common(rast, vect)
-plot(rast, ext = bbox_common[c("xmin", "xmax", "ymin", "ymax")])
-# or
-# plot(rast, ext = bbox_common[c(1, 3, 2, 4)])
-plot(vect, add = TRUE)
-
-tm_shape(rast, bbox = bbox_common) + tm_raster(title = "rast", style = "cont") +
-  tm_layout(legend.position = c("left", "bottom")) +
-  # tm_shape(vect) + tm_borders() # current tmap version (3.3-2) doesn't work with SpatVector
-  tm_shape(vect \%>\% st_as_sf()) + tm_borders()
 }

@@ -10,7 +10,7 @@ test_that("test-st_distance_along", {
   )
 
   expect_equal(
-    st_distance_along(st_point(c(100, 100))),
+    st_distance_along(st_point(c(100, 100))) %>% unname(),
     0
   )
 

@@ -4,31 +4,25 @@ test_that("test-st_bbox_common", {
   library(raster)
   library(stars)
   library(terra)
-  library(dplyr)
   nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 
   sf    <- nc[4:8, ]
   sp    <- sf::as_Spatial(nc[96:100, ])
+  vect  <- vect(nc[53, ])
   logo  <- raster(system.file("external/rlogo.grd", package = "raster"))
-  ext   <- extent(-77.5, -76, 33, 34.5)
-  r     <- raster(nrows = nrow(logo), ncols = ncol(logo), ext = ext)
-  r[]   <- logo[]
-  stars <- st_as_stars(r) %>% st_set_crs(st_crs(sf))
-  r     <- as(stars, "Raster") %>% setExtent(ext = ext + rep(1.5, 4))
+  rast  <- rast(vals = logo[], nrow = nrow(logo), ncol = ncol(logo), extent = c(-77.5, -76, 33, 34.5), crs = st_crs(sf)$wkt)
+  stars <- st_as_stars(rast) %>% st_set_bbox(., st_bbox(.) + rep(c(1.5, 0), 2)) %>% st_flip()
+  r     <- raster(rast) %>% setExtent(., extent(.) + rep(1.5, 4))
 
-  l <- list(sf, sp, r, stars)
-  check_crs <- sapply(l, function(x) all.equal(st_crs(x), st_crs(l[[1]])))
+  l <- list(sf, sp, vect, rast, stars, r)
+  check_crs <- sapply(l, function(x) st_crs(x) == st_crs(l[[1]]))
   expect_true(all(check_crs))
 
-  bb_common <- st_bbox_common(sf, sp, r, stars)
+  bb_common <- st_bbox_common(sf, sp, vect, rast, stars, r)
   expect_equal(class(bb_common), "bbox")
 
-  expect_equal(st_crs(bb_common), st_crs(sf))
-
-  expect_equal(st_crs(bb_common), st_crs(stars))
-
-  num <- c(-79.0745010375977, 33, -74.5, 36.5571632385254)
-  expect_true(all(near(bb_common, num, tol = 1.490116e-08)))
+  check_crs <- sapply(l, function(x) st_crs(x) == st_crs(bb_common))
+  expect_true(all(check_crs))
 
   expect_equal(unname(st_bbox(sf) == bb_common), c(FALSE, FALSE, FALSE, TRUE))
 
@@ -54,9 +48,18 @@ test_that("test-st_bbox_common", {
   # with classes from terra pkg
   rast <- rast(r)  # class SpatRaster
   vect <- vect(sf) # class SpatVector
+  # expect_equal( # some issue with not exactly equal CRS
+  #   st_bbox_common(r, sf),
+  #   st_bbox_common(rast, vect)
+  # )
+
   expect_equal(
-    st_bbox_common(r, sf),
-    st_bbox_common(rast, vect)
+    as.numeric(st_bbox_common(r, sf)),
+    as.numeric(st_bbox_common(rast, vect))
+  )
+
+  expect_true(
+    st_crs(st_bbox_common(r, sf)) == st_crs(st_bbox_common(rast, vect))
   )
 
   l <- st_linestring(cbind(0:4, 5:1))

@@ -82,7 +82,7 @@ st_bbox_list <- function(l) {
     }
   }
   l_bb <- lapply(l, bb_or_st_bbox)
-  if (length(unique(lapply(l_bb, sf::st_crs))) > 1) {
+  if (any(vapply(l_bb, function(x) { sf::st_crs(x) != sf::st_crs(l_bb[[1]]) }, logical(1)))) {
     stop("arguments have different crs", call. = FALSE)
   }
   mat_bb <- vapply(l_bb, invisible, numeric(4))

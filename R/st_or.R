@@ -14,10 +14,6 @@
 #' \code{x} and \code{y} which overlap with the other input layer and applies
 #' geometric operations only on these; \code{FALSE} (default) applies geometric
 #' operations on all geometries (s. Details).
-#' @param use_st_combine \code{TRUE} (default) applies internally
-#' \code{st_union(st_combine())} to \code{x} and \code{y}; \code{FALSE} leaves out
-#' \code{\link[sf]{st_combine}} and only uses \code{\link[sf]{st_union}}, which
-#' might be slower, but more reliable (s. Details of \code{\link[sfhelpers]{st_erase_robust}}).
 #' @param ... arguments passed on to \code{\link[s2]{s2_options}}
 #'
 #' @return geometry set containing the intersection of \code{x} and \code{y} and
@@ -126,7 +122,7 @@
 #'   st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
 #' )
 #' @export
-st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, check_overlap = FALSE, use_st_combine = TRUE, ...) {
+st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, check_overlap = FALSE, ...) {
   # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message
   if (!inherits(x, c("sf", "sfc", "sfg"))) {
     stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
@@ -168,10 +164,6 @@ st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, che
 
   if(!isTRUE(check_overlap) & !isFALSE(check_overlap)){
     stop("check_overlap must be a single logical value: TRUE or FALSE", call. = FALSE)
-  }
-
-  if (!isTRUE(use_st_combine) & !isFALSE(use_st_combine)) {
-    stop("use_st_combine must be a single logical value: TRUE or FALSE", call. = FALSE)
   }
 
   # in case x or y are ar of class sfc or sfg turn them into sf objects
@@ -225,8 +217,8 @@ st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, che
   overlap <- sf::st_intersection(x, y, ...)
 
   # get the non-intersecting parts with sfhelpers:::st_erase()
-  x_diff <- st_erase(x, y, use_st_combine, ...)
-  y_diff <- st_erase(y, x, use_st_combine, ...)
+  x_diff <- st_erase(x, y, ...)
+  y_diff <- st_erase(y, x, ...)
 
   # stack the intersecting and non-intersecting parts and set missing attributes to NA
   l                <- list(overlap, x_diff, y_diff, x_no_int, y_no_int)

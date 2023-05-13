@@ -172,20 +172,4 @@ test_that("test-st_or", {
   # plot(st_geometry(or)[lengths(eq) != 1], add = TRUE, col = "red")
   diff <- sum(st_area(or)) - sum(st_area(or_check_overlap)) # 3.051758e-05 [m^2] -> not that much!
   expect_true(as.numeric(diff) < 3.1e-05)
-  # ----------------------------------------------------------------------------
-  # argument use_st_combine
-  expect_error(
-    st_or(poly_1, poly_2, use_st_combine = c(TRUE, FALSE)),
-    "use_st_combine must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_or(poly_1, poly_2, use_st_combine = NA),
-    "use_st_combine must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_equal(
-    st_or(poly_1, poly_2),
-    st_or(poly_1, poly_2, use_st_combine = FALSE)
-  )
 })

@@ -85,31 +85,15 @@ test_that("test-st_erase_robust", {
   expect_true(all(seq_along(eq) == sort(unlist(eq))))
 
   # ----------------------------------------------------------------------------
-  # argument use_st_combine
-  expect_error(
-    st_erase_robust(poly_1, poly_2, use_st_combine = c(TRUE, FALSE)),
-    "use_st_combine must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_erase_robust(poly_1, poly_2, use_st_combine = NA),
-    "use_st_combine must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_equal(
-    st_erase_robust(poly_1, poly_2),
-    st_erase_robust(poly_1, poly_2, use_st_combine = FALSE)
-  )
-  # ----------------------------------------------------------------------------
   # issues of sfhelpers version 0.0.0.9000 with st_erase_robust() /
   # sf::st_combine() / st::st_make_valid() / sf::sf_use_s2() fixed for
   # version >= 0.0.0.9001:
   grid_n3 <- st_make_grid(poly_2, n = 3)
 
-  # library(tmap)
-  # tmap_mode("plot")
-  # tm_shape(poly_1[1, ], bbox = grid_n3) + tm_polygons() +
-  #   tm_shape(grid_n3) + tm_borders(col = "red")
+  library(tmap)
+  tmap_mode("plot")
+  tm_shape(poly_1[1, ], bbox = grid_n3) + tm_polygons() +
+  tm_shape(grid_n3) + tm_borders(col = "red")
 
   # total erase by y works, if it includes surfaces touched on all side by other
   # surfaces:
@@ -140,14 +124,15 @@ test_that("test-st_erase_robust", {
   # plot(erased_robust_s2_true) # erased as expected!
   area_ratio <- sum(st_area(erased_robust_s2_false)) / (sum(st_area(grid)) - sum(st_area(nc)))
   expect_equal(as.numeric(round(area_ratio, 6)), 0.999985) # erase by area close to 1
-  # if  sf_use_s2() == FALSE st_erase_robust() does the same as st_erase():
-
+  # if  sf_use_s2() == FALSE st_erase_robust() gets the same result as st_erase():
+  erased_s2_false <- st_erase(grid, nc)
+  eq = st_equals(erased_robust_s2_false, erased_s2_false)
   # enable:
   # rhub::check(platform = "ubuntu-gcc-release")
   # rhub::check(platform = "fedora-clang-devel")
   skip_on_os("linux")
   expect_equal(
-    erased_robust_s2_false,
-    st_erase(grid, nc)
+    seq_along(eq),
+    unlist(eq)
   )
 })

@@ -11,7 +11,6 @@ st_or(
   suffix = c(".x", ".y"),
   suffix.all = FALSE,
   check_overlap = FALSE,
-  use_st_combine = TRUE,
   ...
 )
 }
@@ -35,11 +34,6 @@ suffixes only homonymous attribute headings.}
 \code{x} and \code{y} which overlap with the other input layer and applies
 geometric operations only on these; \code{FALSE} (default) applies geometric
 operations on all geometries (s. Details).}
-
-\item{use_st_combine}{\code{TRUE} (default) applies internally
-\code{st_union(st_combine())} to \code{x} and \code{y}; \code{FALSE} leaves out
-\code{\link[sf]{st_combine}} and only uses \code{\link[sf]{st_union}}, which
-might be slower, but more reliable (s. Details of \code{\link[sfhelpers]{st_erase_robust}}).}
 
 \item{...}{arguments passed on to \code{\link[s2]{s2_options}}}
 }

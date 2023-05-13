@@ -12,16 +12,6 @@ test_that("test-st_rbindlist", {
   )
 
   expect_error(
-    st_rbindlist(list_of_sf, use_geometry = NA),
-    "use_geometry must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_rbindlist(list_of_sf, use_geometry = c(TRUE, FALSE)),
-    "use_geometry must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
     st_rbindlist(list_of_sf, geometry_name = factor("new_geometry_name")),
     "geometry_name must be either NULL or a single character string"
   )
@@ -55,20 +45,14 @@ test_that("test-st_rbindlist", {
   expect_true(c(names(poly_1), names(poly_2)) %in% names(matched_by_names) %>% all())
 
   poly_1_new_geom <- st_set_geometry(poly_1, "new_geom")
-
-  expect_error(
-    # differently named and positioned geometry columns can't be matched by name!
-    st_rbindlist(list(poly_1_new_geom, poly_2), use.names = TRUE, fill = TRUE)
-  )
-
+  newly_stacked <- st_rbindlist(list(poly_1_new_geom, poly_2, poly_1), use.names = TRUE, fill = TRUE)
+  # by default the name of the frist listed active geometry column is passed on
   expect_equal(
-    # differently named and positioned geometry columns -> separately matched geometry columns
-    st_rbindlist(list(poly_1_new_geom, poly_2), use.names = TRUE, fill = TRUE, use_geometry = TRUE, geometry_name = "very_new_geom"),
-    # same named, but differently positioned geometry columns -> no need for separately matching
-    st_rbindlist(list(poly_1, poly_2), use.names = TRUE, fill = TRUE, geometry_name = "very_new_geom")
+    attr(poly_1_new_geom, "sf_column"),
+    attr(newly_stacked, "sf_column")
   )
 
-  l_different_geometry_types <- list(nc[1:3, ], st_cast(nc[4, ], "POLYGON", warn = FALSE))
+  l_different_geometry_types <- list(nc[1:3, ], st_cast(nc[4, ], "POLYGON", warn = FALSE), nc[NULL, ])
 
   n_geom_type <- vapply(l_different_geometry_types, st_geometry_type, by_geometry = FALSE, factor(1)) %>%
     unique() %>%

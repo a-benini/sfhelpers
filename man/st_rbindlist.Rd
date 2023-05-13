@@ -4,18 +4,13 @@
 \alias{st_rbindlist}
 \title{Convert a list of sf objects to a single sf object}
 \usage{
-st_rbindlist(l, ..., use_geometry = FALSE, geometry_name = NULL)
+st_rbindlist(l, ..., geometry_name = NULL)
 }
 \arguments{
 \item{l}{\code{list} of objects of the class \code{sf}}
 
 \item{...}{arguments of the function \code{\link[data.table]{rbindlist}}
 except \code{l}}
-
-\item{use_geometry}{\code{TRUE} detects and binds the active list-columns
-with simple feature geometries separately, thus enabling matching of geometry
-columns differing by name as well as by position across the \code{list}ed sf
-objects.}
 
 \item{geometry_name}{a single character string giving a user-defined name to
 the returned active list-column with simple feature geometries. If
@@ -43,17 +38,15 @@ information on how to handle this \code{rbindlist} issue can be found
 }
 Remarks about matching geometry columns of input \code{sf} objects:
 \itemize{
-\item If the geometry columns are identically named, but differ by position
-within
+\item If the attribute columns are identically named, but differ by
+position within
 each \code{sf} object, set \code{use.names = TRUE} and \code{fill = TRUE}.
-\item If the geometry (and other) columns are differently named, but have
+\item If the geometry and/or attribute columns are differently named, but
+have
 same position within every \code{sf} object, set \code{use.names = FALSE}.
-\item If the geometry columns are differently named and at the same time
-differently positioned, set \code{use_geometry = TRUE}. This detects the
-geometry columns and then matches them separately while the other columns
-can still be treated collectively by the arguments \code{use.names} and
-\code{fill}. Note that matching geometry columns separately requires more
-processing time.
+\item In any case the active geometry columns of the listed
+\code{sf}-objects are matched due to the identical internal naming of
+these columns.
 }
 }
 \examples{
@@ -68,22 +61,15 @@ list_of_sf <- lapply(1:nrow(nc), function(x) nc[x, ])
 nc_new <- st_rbindlist(list_of_sf)
 all.equal(nc, nc_new)
 
-# list of sf-objects having differently named, but identically positioned
-# geometry columns (attribute columns are also same-positioned and still
-# same-named):
-list_of_sf <- lapply(
-  1:nrow(nc),
-  function(x) st_set_geometry(nc[x, ], paste0("geom_", x))
-  )
-# such a list of sf-objects is easy to stack ...
-nc_new_2 <- st_rbindlist(list_of_sf, use.name = FALSE)
-# ... but by default the name of the returned geometry column ...
-attr(nc_new_2, "sf_column")
-# ... is inherited from the first listed sf-object:
-attr(nc_new_2, "sf_column") == attr(list_of_sf[[1]], "sf_column")
-# user defined name of the stacked geometry column:
-nc_new_3 <- st_rbindlist(list_of_sf, use.name = FALSE, geometry_name = "geom")
-attr(nc_new_3, "sf_column")
+# a list of sf-objects having ...
+l <- lapply(
+  1:3,
+  function(x){data.frame(nc[x, 1:3]) \%>\% setNames(., c(paste0(names(.), "_", x))) \%>\% st_sf()}
+)
+# ... differently named, but identically positioned geometry & attribute columns
+sapply(l, names) \%>\% t()
+# by setting use.name = FALSE such a list of sf-objects is easy to stack:
+st_rbindlist(l, use.name = FALSE)
 
 # from which listed element / sf-object do the stacked features originate?
 l <- list(A = nc[1, 1:3], B = NULL, C = nc[2:3, 1:3])
@@ -104,15 +90,15 @@ l <- lapply(
   )
 sapply(l, attr, "sf_column") # geometry column names of listed sf-objects
 
-# ... requires use_geometry = TRUE for detecting and binding the geometry
-# columns (separately from the attribute columns):
-st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE)
+# ... can be handled also by setting use.name = TRUE and fill = TRUE:
+st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE)
+# this works because st_rbindlist() internally renames all active geometry columns identically!
 
-# note: if use_geometry = TRUE, the name of the returned geometry column ...
-# ... is by default inherited from the first listed sf-object. The user ...
+# note: as shown above the name of the returned geometry column ...
+# ... is inherited by default from the first listed sf-object. The user ...
 # ... can set an alternative geometry column name:
-st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE,
-             geometry_name = "geom")
+st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE,
+            geometry_name = "geom_named_by_user")
 }
 \seealso{
 \href{../doc/rbindlist_issues.html}{\code{vignette("rbindlist_issues")}}

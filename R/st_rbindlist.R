@@ -5,10 +5,6 @@
 #' @param l \code{list} of objects of the class \code{sf}
 #' @param ... arguments of the function \code{\link[data.table]{rbindlist}}
 #' except \code{l}
-#' @param use_geometry \code{TRUE} detects and binds the active list-columns
-#' with simple feature geometries separately, thus enabling matching of geometry
-#' columns differing by name as well as by position across the \code{list}ed sf
-#' objects.
 #' @param geometry_name  a single character string giving a user-defined name to
 #' the returned active list-column with simple feature geometries. If
 #' unspecified / by default (\code{NULL}), the geometry column name is inherited
@@ -18,8 +14,8 @@
 #'
 #' @export
 #'
-#' @importFrom data.table as.data.table rbindlist
-#' @importFrom sf st_as_sf st_crs st_geometry_type st_geometry st_drop_geometry st_sf
+#' @importFrom data.table rbindlist
+#' @importFrom sf st_as_sf st_crs st_geometry_type
 #' @importFrom uuid UUIDgenerate
 #'
 #' @details \code{st_rbindlist()} is basically a wrapper for
@@ -36,17 +32,15 @@
 #' }
 #' Remarks about matching geometry columns of input \code{sf} objects:
 #' \itemize{
-#'   \item If the geometry columns are identically named, but differ by position
-#'   within
+#'   \item If the attribute columns are identically named, but differ by
+#'   position within
 #'   each \code{sf} object, set \code{use.names = TRUE} and \code{fill = TRUE}.
-#'   \item If the geometry (and other) columns are differently named, but have
+#'   \item If the geometry and/or attribute columns are differently named, but
+#'   have
 #'   same position within every \code{sf} object, set \code{use.names = FALSE}.
-#'   \item If the geometry columns are differently named and at the same time
-#'   differently positioned, set \code{use_geometry = TRUE}. This detects the
-#'   geometry columns and then matches them separately while the other columns
-#'   can still be treated collectively by the arguments \code{use.names} and
-#'   \code{fill}. Note that matching geometry columns separately requires more
-#'   processing time.
+#'   \item In any case the active geometry columns of the listed
+#'   \code{sf}-objects are matched due to the identical internal naming of
+#'   these columns.
 #' }
 #'
 #' @seealso \href{../doc/rbindlist_issues.html}{\code{vignette("rbindlist_issues")}}
@@ -62,22 +56,15 @@
 #' nc_new <- st_rbindlist(list_of_sf)
 #' all.equal(nc, nc_new)
 #'
-#' # list of sf-objects having differently named, but identically positioned
-#' # geometry columns (attribute columns are also same-positioned and still
-#' # same-named):
-#' list_of_sf <- lapply(
-#'   1:nrow(nc),
-#'   function(x) st_set_geometry(nc[x, ], paste0("geom_", x))
-#'   )
-#' # such a list of sf-objects is easy to stack ...
-#' nc_new_2 <- st_rbindlist(list_of_sf, use.name = FALSE)
-#' # ... but by default the name of the returned geometry column ...
-#' attr(nc_new_2, "sf_column")
-#' # ... is inherited from the first listed sf-object:
-#' attr(nc_new_2, "sf_column") == attr(list_of_sf[[1]], "sf_column")
-#' # user defined name of the stacked geometry column:
-#' nc_new_3 <- st_rbindlist(list_of_sf, use.name = FALSE, geometry_name = "geom")
-#' attr(nc_new_3, "sf_column")
+#' # a list of sf-objects having ...
+#' l <- lapply(
+#'   1:3,
+#'   function(x){data.frame(nc[x, 1:3]) %>% setNames(., c(paste0(names(.), "_", x))) %>% st_sf()}
+#' )
+#' # ... differently named, but identically positioned geometry & attribute columns
+#' sapply(l, names) %>% t()
+#' # by setting use.name = FALSE such a list of sf-objects is easy to stack:
+#' st_rbindlist(l, use.name = FALSE)
 #'
 #' # from which listed element / sf-object do the stacked features originate?
 #' l <- list(A = nc[1, 1:3], B = NULL, C = nc[2:3, 1:3])
@@ -98,21 +85,18 @@
 #'   )
 #' sapply(l, attr, "sf_column") # geometry column names of listed sf-objects
 #'
-#' # ... requires use_geometry = TRUE for detecting and binding the geometry
-#' # columns (separately from the attribute columns):
-#' st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE)
+#' # ... can be handled also by setting use.name = TRUE and fill = TRUE:
+#' st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE)
+#' # this works because st_rbindlist() internally renames all active geometry columns identically!
 #'
-#' # note: if use_geometry = TRUE, the name of the returned geometry column ...
-#' # ... is by default inherited from the first listed sf-object. The user ...
-#' # ... can set an alternative geometry column name:
-#' st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE, use_geometry = TRUE,
-#'              geometry_name = "geom")
-st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
+#'# note: as shown above the name of the returned geometry column ...
+#'# ... is inherited by default from the first listed sf-object. The user ...
+#'# ... can set an alternative geometry column name:
+#'st_rbindlist(l, use.name = TRUE, fill = TRUE, idcol = TRUE,
+#'             geometry_name = "geom_named_by_user")
+st_rbindlist <- function(l, ..., geometry_name = NULL) {
   if (!is.list(l) || is.data.frame(l)) {
     stop("input is ", class(l)[1L], " but should be a plain list of sf objects to be stacked", call. = FALSE)
-  }
-  if(!(isTRUE(use_geometry) | isFALSE(use_geometry))){
-    stop("use_geometry must be a single logical value: TRUE or FALSE", call. = FALSE)
   }
   if(!(is.null(geometry_name) | (is.character(geometry_name) & length(geometry_name) == 1))){
     stop("geometry_name must be either NULL or a single character string", call. = FALSE)
@@ -127,28 +111,34 @@ st_rbindlist <- function(l, ..., use_geometry = FALSE, geometry_name = NULL) {
   if (length(unique(lapply(l[is_not_null], sf::st_crs))) > 1) {
     stop("arguments have different crs", call. = FALSE)
   }
-  if(use_geometry){
-    geometry <- do.call(c, lapply(l[is_not_null], sf::st_geometry))
-    tmp_col <- uuid::UUIDgenerate()
-    get_non_geometry <- function(x) { if(is.null(x)) {x} else {data.table::as.data.table(sf::st_drop_geometry(x), keep.rownames = tmp_col)} }
-    non_geometry <- data.table::rbindlist(lapply(l, get_non_geometry), ...)
-    sf <- sf::st_sf(non_geometry, geometry)
-    sf <- sf[ ,names(sf) != tmp_col]
-  } else {
-    if (length(unique(vapply(l[is_not_null], sf::st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
-      for (i in seq_along(l)[is_not_null]) {
-        class(l[[i]][[attr(l[[i]], "sf_column")]])[[1]] <- "sfc_GEOMETRY"
-      }
+
+  # name of geometry column of the first listed sf-object
+  first_geometry_name <- attr(l[is_not_null][[1]], "sf_column")
+
+  # homogenize name of active geometry columns
+  if(length(unique(vapply(l[is_not_null], attr, which = "sf_column", character(1)))) > 1){
+    tmp_geometry_name <- uuid::UUIDgenerate()
+    for (i in seq_along(l)[is_not_null]) {
+      sf::st_geometry(l[[i]]) <- tmp_geometry_name
     }
-    sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
-    sf <- sf[seq_len(nrow(sf)), ]
-    class(sf) <- c("sf", "data.frame")
   }
-  if(!is.null(geometry_name)){
+
+  # homogenize geometry types
+  if (length(unique(vapply(l[is_not_null], sf::st_geometry_type, by_geometry = FALSE, factor(1)))) > 1) {
+    for (i in seq_along(l)[is_not_null]) {
+      class(l[[i]][[attr(l[[i]], "sf_column")]])[[1]] <- "sfc_GEOMETRY"
+    }
+  }
+
+  sf <- sf::st_as_sf(data.table::rbindlist(l, ...))
+  sf <- sf[seq_len(nrow(sf)), ]
+  class(sf) <- c("sf", "data.frame")
+
+  if(is.null(geometry_name)){
+    sf::st_geometry(sf) <- first_geometry_name
+  }else{
     sf::st_geometry(sf) <- geometry_name
   }
-  if(is.null(geometry_name) & use_geometry){
-    sf::st_geometry(sf) <- attr(l[is_not_null][[1]], "sf_column")
-  }
+
   return(sf)
 }

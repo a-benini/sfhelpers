@@ -4,17 +4,12 @@
 \alias{st_erase_robust}
 \title{Erasing from geometry set \code{x} all parts overlapped by geometry set \code{y}}
 \usage{
-st_erase_robust(x, y, check_overlap = FALSE, ...)
+st_erase_robust(x, y, ...)
 }
 \arguments{
 \item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 
 \item{y}{object of class \code{sf}, \code{sfc} or \code{sfg}}
-
-\item{check_overlap}{\code{TRUE} detects those geometries included in
-\code{x} and \code{y} which overlap with the other input layer and applies
-geometric operations only on these; \code{FALSE} (default) applies geometric
-operations on all geometries (s. Details).}
 
 \item{...}{arguments passed on to \code{\link[s2]{s2_options}}}
 }
@@ -33,32 +28,25 @@ erases all parts from geometry set \code{x} overlapped by geometry set \code{y}.
 This function sometimes works as expected, sometimes it doesn't. (s. examples
 below).
 
-Even when both input layers \code{x} and \code{y} consist of valid
-geometries (which can be checked with \code{\link[sf]{st_is_valid}},
-respectively fixed with \code{\link[sf]{st_make_valid}}), the a. m. helper
-function can still throw an error. This is often due to internally applying
-\code{st_union(st_combine())} to \code{y}. So, currently
-\code{st_erase_robust()} uses in case of failure as a second option
-\code{\link[sf]{st_union}} only. Leaving out \code{\link[sf]{st_combine}}
-may very well add to the complexity of the involved geometries; thus the
-second option may be rather slow. For this reason, if the coordinates of the
-input are longlat degrees, setting \code{\link[sf]{sf_use_s2}} to
-\code{FALSE} can help to speed up \code{st_erase_robust()} (s.examples below).
+Even when both input layers \code{x} and \code{y} consist of valid geometries
+(which can be checked with \code{\link[sf]{st_is_valid}}, respectively fixed
+with \code{\link[sf]{st_make_valid}}), the a. m. helper function can still
+throw an error. This is often due to internally applying
+\code{st_union(st_combine())} to \code{y}. \code{\link[sf]{st_combine}} is
+sometimes also the cause for returning incorrectly erased geometry. To avoid
+these issues, \code{st_erase_robust()} uses \code{\link[sf]{st_union}} only.
+Leaving out \code{st_combine()} may add to the complexity of the
+involved geometries, thus potentially increasing the run time. To counteract
+this, \code{st_erase_robust()} detects with the help of
+\code{\link[sf]{st_intersects}} which geometries from the input \code{x} and
+\code{y} overlap with those of the other layer and applies geometric
+operations only to such geometries.
 
-In case of a significant proportion of non-overlapping geometries, setting
-\code{check_overlap} to \code{TRUE} can shorten run time. As the internal
-distinction of overlapping and non-overlapping geometries relies on
-\code{\link[sf]{st_intersects}}, which itself is time consuming,
-\code{check_overlap = TRUE} involves a trade off: If all geometries overlap,
-\code{check_overlap = TRUE} will only increase the run time. On the other
-hand, the higher the proportion of non-overlapping geometries, the more this
-argument specification shortens the processing time by leaving out
-unnecessary geometric operations. Ideally the user has previous knowledge
-about how little or how much the input layers \code{x} and \code{y} overlap
-with each other in order to apply \code{check_overlap} in a informed way. In
-general, setting \code{check_overlap} to \code{TRUE} is advantageous when
-\code{x} or \code{y} are large geometry sets and include more complex
-geometries.
+When using the helper function from the a.m. \code{sf} help page with input
+having longlat degrees CRS, switching off spherical geometry (s2) by setting
+\code{\link[sf]{sf_use_s2}} to \code{FALSE} can help to overcome issues.
+But this isn't a safe workaround for all issues caused by \code{st_combine()}
+when it comes to erasing.
 }
 \examples{
 library(sf)
@@ -91,18 +79,4 @@ st_union(st_combine(nc))
 
 # st_erase_robust() can handle this:
 st_erase_robust(grid, nc) \%>\% plot()
-
-sf_use_s2(FALSE) # if spherical geometry (s2) is switched off,
-# sfhelpers::st_erase_robust() & helper function st_erase() should work and
-# return the same (st_erase() might still not work on some Linux operation
-# systems):
-\dontrun{
-all.equal(
- st_erase_robust(grid, nc),
- st_erase(grid, nc)
-)
-
-# because internal handling of input y (nc) won't throw an error:
-st_union(st_combine(nc))
-}
 }

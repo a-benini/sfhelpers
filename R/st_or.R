@@ -5,15 +5,12 @@
 #' @param dim integer: A combination of 0, 1, and/or 2 (default) that constrains
 #' the dimension(s) of the returned geometries. 0 for points, 1 for lines, 2 for
 #' surfaces.
-#' @param suffix length 2 character vector (default \code{c(".x", ".y")}) attached as
-#' suffix to attribute headings inherited from argument \code{x} resp. from \code{y}
+#' @param suffix length 2 character vector (default \code{c(".x", ".y")})
+#' attached as suffix to attribute headings inherited from argument \code{x}
+#' resp. from \code{y}
 #' @param suffix.all \code{TRUE} suffixes all attribute headings inherited from
-#' arguments \code{x} and \code{y} according to \code{suffix}; \code{FALSE} (default)
-#' suffixes only homonymous attribute headings.
-#' @param check_overlap \code{TRUE} detects those geometries included in
-#' \code{x} and \code{y} which overlap with the other input layer and applies
-#' geometric operations only on these; \code{FALSE} (default) applies geometric
-#' operations on all geometries (s. Details).
+#' arguments \code{x} and \code{y} according to \code{suffix}; \code{FALSE}
+#' (default) suffixes only homonymous attribute headings.
 #' @param ... arguments passed on to \code{\link[s2]{s2_options}}
 #'
 #' @return geometry set containing the intersection of \code{x} and \code{y} and
@@ -36,26 +33,10 @@
 #'   corresponding to the geometry set they originated from (s. below examples)
 #'   \item handling of input layers with differently named geometry columns
 #'   and/or being totally overlapped by the other input layer.
-#'   \item optional restriction of the geometric operations to geometries of the
-#'   input layers \code{x} and \code{y} overlapping those of the other input
-#'   layer (argument \code{check_overlap = TRUE}). In case of a significant
-#'   proportion of non-overlapping geometries, this can shorten run time. As the
-#'   internal distinction of overlapping and non-overlapping geometries relies
-#'   on \code{\link[sf]{st_intersects}}, which itself is time consuming, setting
-#'   \code{check_overlap} to \code{TRUE} involves a trade off: If all geometries
-#'   overlap, \code{check_overlap = TRUE} will only increase the run time. On
-#'   the other hand, the higher the proportion of non-overlapping geometries,
-#'   the more this argument specification shortens the processing time by
-#'   leaving out unnecessary geometric operations. Ideally the user has previous
-#'   knowledge about how little or how much the input layers \code{x} and
-#'   \code{y} overlap with each other in order to apply \code{check_overlap} in
-#'   a informed way.
+#'   \item restricts geometric operations to geometries of the input layers
+#'   \code{x} and \code{y} overlapping those of the other input
+#'   layer (same as \code{\link{st_erase_robust}}).
 #' }
-#'
-#' If the coordinates of the input are longlat degrees, setting
-#' \code{\link[sf]{sf_use_s2}} to \code{FALSE} can help to speed up
-#' \code{st_erase_robust()} and thus also \code{st_or()}. For information on
-#' this see details and examples sections of \code{\link{st_erase_robust}}.
 #'
 #' @importFrom data.table as.data.table rbindlist
 #' @importFrom sf st_crs st_sf st_agr st_dimension st_intersection st_geometry
@@ -122,7 +103,7 @@
 #'   st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
 #' )
 #' @export
-st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, check_overlap = FALSE, ...) {
+st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, ...) {
   # if x or y are not of the class "sf", "sfc" or "sfg" throw a corresponding error message
   if (!inherits(x, c("sf", "sfc", "sfg"))) {
     stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
@@ -162,10 +143,6 @@ st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, che
     stop("suffix.all must be a single logical value: TRUE or FALSE", call. = FALSE)
   }
 
-  if(!isTRUE(check_overlap) & !isFALSE(check_overlap)){
-    stop("check_overlap must be a single logical value: TRUE or FALSE", call. = FALSE)
-  }
-
   # in case x or y are ar of class sfc or sfg turn them into sf objects
   if (!inherits(x, "sf")) {
     x <- sf::st_sf(geometry = sf::st_geometry(x))
@@ -200,18 +177,14 @@ st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, che
   # to get the remainder of the intersection sfhelpers:::st_erase()* is used (s. below) instead of the formerly here coded st_erase()
   # (*improved version of st_erase() found under ?st_difference)
 
-  if(check_overlap){ # separate intersecting and non-intersecting geometries
-    int      <- sf::st_intersects(x, y, ...)
-    int_x    <- lengths(int) > 0
-    int_y    <- seq_len(nrow(y)) %in% unique(unlist(int))
-    x_no_int <- x[!int_x, ]
-    x        <- x[int_x, ]
-    y_no_int <- y[!int_y, ]
-    y        <- y[int_y, ]
-  } else { # placeholder with zero rows
-    x_no_int <- x[NULL, ]
-    y_no_int <- y[NULL, ]
-  }
+  # separate intersecting and non-intersecting geometries
+  int      <- sf::st_intersects(x, y, ...)
+  int_x    <- lengths(int) > 0
+  int_y    <- seq_len(nrow(y)) %in% unique(unlist(int))
+  x_no_int <- x[!int_x, ]
+  x        <- x[int_x, ]
+  y_no_int <- y[!int_y, ]
+  y        <- y[int_y, ]
 
   # get overlap via intersection
   overlap <- sf::st_intersection(x, y, ...)
@@ -248,4 +221,3 @@ st_or <- function(x, y, dim = 2, suffix = c(".x", ".y"), suffix.all = FALSE, che
 
   return(output)
 }
-

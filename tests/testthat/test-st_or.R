@@ -138,38 +138,4 @@ test_that("test-st_or", {
     st_or(A, B, dim = c(0, 1)), # returns points & lines
     st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
   )
-  # ----------------------------------------------------------------------------
-  # argument check_overlap
-  expect_error(
-    st_or(poly_1, poly_2, check_overlap = c(TRUE, FALSE)),
-    "check_overlap must be a single logical value: TRUE or FALSE"
-  )
-
-  expect_error(
-    st_or(poly_1, poly_2, check_overlap = NA),
-    "check_overlap must be a single logical value: TRUE or FALSE"
-  )
-
-  nc         <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
-  st_agr(nc) <- "constant"
-  expect_true(st_is_longlat(nc))
-  ext        <- st_bbox(nc) + rep(c(-0.1, 0.1), each = 2)
-  grid       <- st_make_grid(ext) %>% st_sf(id = seq_along(.), geom = ., agr = "constant")
-
-  sf_use_s2(TRUE)
-  or <- st_or(grid, nc)
-  # plot(or[,c(1,2)])
-  area_ratio <- sum(st_area(or)) / sum(st_area(grid))
-  expect_equal(as.numeric(round(area_ratio, 6)), 1) # check by area close to 1
-
-  or_check_overlap <- st_or(grid, nc, check_overlap = TRUE)
-  # plot(or_check_overlap[,c(2,1)])
-
-  expect_false(isTRUE(all.equal(or, or_check_overlap)))
-  eq <- st_equals(or, or_check_overlap)
-  expect_false(all(lengths(eq) == 1))
-  # plot(st_geometry(or))
-  # plot(st_geometry(or)[lengths(eq) != 1], add = TRUE, col = "red")
-  diff <- sum(st_area(or)) - sum(st_area(or_check_overlap)) # 3.051758e-05 [m^2] -> not that much!
-  expect_true(as.numeric(diff) < 3.1e-05)
 })

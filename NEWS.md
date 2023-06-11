@@ -1,3 +1,25 @@
+# sfhelpers 0.0.0.9004
+* add summary statistical functions for `sfg`, `sfc` and `sf` objects: 
+  - `st_geometry_summary()`
+  - `st_area_sum()`
+  - `st_length_sum()`
+  - `st_perimeter_sum()`
+  - `st_perimeter_2d_sum()`
+* add function `st_layers_as_df()`
+* make returns of `st_erase_robust()` and `st_or()` reliable by abandoning
+internal use of `st_union(st_combine())` in any case. And therefore also
+abandoning argument `use_st_combine`. Instead, only `st_union()` is used, which
+may slow down `st_erase_robust()` and `st_or()`.
+* abandon argument `check_overlap` in `st_or()` and `st_erase_robust()`. These
+functions now detect automatically which geometries from the input `x` and `y`
+overlap with those of the other layer and apply geometric operations only to
+such geometries. This change makes for shorter run times.
+* fixed bug: `st_rbindlist()` now always stacks the active geometry columns of
+the `list`ed `sf`-inputs. --> abandon argument `use_geometry`.
+* fixed bug: `st_bbox_common()` / `st_bbox_list()` CRS check works.
+* improve help pages.
+* `st_disaggregate()` might fail if geometries of input have M-dimension. This due to changes in `sf`-package version 1.0-13 associated with `st_cast()`, on which `st_disaggregate()` is built. No quick fix yet.
+  
 # sfhelpers 0.0.0.9003
 * add function `st_distance_along()`.
 * add argument `use_st_combine` (default `TRUE`) to functions `st_erase_robust()`

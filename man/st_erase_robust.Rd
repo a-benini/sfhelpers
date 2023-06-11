@@ -52,9 +52,7 @@ when it comes to erasing.
 library(sf)
 
 # find code of helper function st_erase():
-\dontrun{
-?geos_binary_ops
-}
+# ?geos_binary_ops
 
 # copy function code:
 st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
@@ -68,14 +66,10 @@ st_is_longlat(nc) # demo data has a longlat degrees crs
 
 sf_use_s2(TRUE)
 # check if helper function works with demo data:
-\dontrun{
-st_erase(grid, nc)
-}
+try(st_erase(grid, nc))
 
 # internal processing of input y (nc) returns the same error as st_erase():
-\dontrun{
-st_union(st_combine(nc))
-}
+try(st_union(st_combine(nc)))
 
 # st_erase_robust() can handle this:
 st_erase_robust(grid, nc) \%>\% plot()

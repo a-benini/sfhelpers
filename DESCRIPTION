@@ -18,6 +18,7 @@ Depends:
 Imports: 
     data.table,
     lifecycle,
+    lwgeom,
     sf (>= 1.0.6),
     tmaptools,
     uuid

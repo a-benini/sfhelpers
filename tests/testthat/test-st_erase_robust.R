@@ -93,13 +93,14 @@ test_that("test-st_erase_robust", {
   # plot(erased_robust_s2_true) # erased as expected!
   area_ratio <- sum(st_area(erased_robust_s2_false)) / (sum(st_area(grid)) - sum(st_area(nc)))
   expect_equal(as.numeric(round(area_ratio, 6)), 0.999985) # erase by area close to 1
+
+  # enable:
+  # rhub::check(platform = "ubuntu-gcc-release")
+  skip_on_os("linux")
+
   # if  sf_use_s2() == FALSE st_erase_robust() gets the same result as st_erase():
   erased_s2_false <- st_erase(grid, nc)
   eq = st_equals(erased_robust_s2_false, erased_s2_false)
-  # enable:
-  # rhub::check(platform = "ubuntu-gcc-release")
-  # rhub::check(platform = "fedora-clang-devel")
-  skip_on_os("linux")
   expect_true(all(lengths(eq) == 1))
   # for each geometry produced by one method there's equivalent from the other method!
 })

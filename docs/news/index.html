@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
       </span>
     </div>
 
@@ -74,6 +74,25 @@
       <small>Source: <a href="https://github.com/a-benini/sfhelpers/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.0.9004" id="sfhelpers-0009004">sfhelpers 0.0.0.9004<a class="anchor" aria-label="anchor" href="#sfhelpers-0009004"></a></h2>
+<ul><li>add summary statistical functions for <code>sfg</code>, <code>sfc</code> and <code>sf</code> objects:
+<ul><li><code><a href="../reference/geos_stats.html">st_geometry_summary()</a></code></li>
+<li><code><a href="../reference/geos_stats.html">st_area_sum()</a></code></li>
+<li><code><a href="../reference/geos_stats.html">st_length_sum()</a></code></li>
+<li><code><a href="../reference/geos_stats.html">st_perimeter_sum()</a></code></li>
+<li><code><a href="../reference/geos_stats.html">st_perimeter_2d_sum()</a></code></li>
+</ul></li>
+<li>add function <code><a href="../reference/st_layers_as_df.html">st_layers_as_df()</a></code>
+</li>
+<li>make returns of <code><a href="../reference/st_erase_robust.html">st_erase_robust()</a></code> and <code><a href="../reference/st_or.html">st_or()</a></code> reliable by abandoning internal use of <code>st_union(st_combine())</code> in any case. And therefore also abandoning argument <code>use_st_combine</code>. Instead, only <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union()</a></code> is used, which may slow down <code><a href="../reference/st_erase_robust.html">st_erase_robust()</a></code> and <code><a href="../reference/st_or.html">st_or()</a></code>.</li>
+<li>abandon argument <code>check_overlap</code> in <code><a href="../reference/st_or.html">st_or()</a></code> and <code><a href="../reference/st_erase_robust.html">st_erase_robust()</a></code>. These functions now detect automatically which geometries from the input <code>x</code> and <code>y</code> overlap with those of the other layer and apply geometric operations only to such geometries. This change makes for shorter run times.</li>
+<li>fixed bug: <code><a href="../reference/st_rbindlist.html">st_rbindlist()</a></code> now always stacks the active geometry columns of the <code>list</code>ed <code>sf</code>-inputs. –&gt; abandon argument <code>use_geometry</code>.</li>
+<li>fixed bug: <code><a href="../reference/st_bbox_common.html">st_bbox_common()</a></code> / <code><a href="../reference/st_bbox_common.html">st_bbox_list()</a></code> CRS check works.</li>
+<li>improve help pages.</li>
+<li>
+<code><a href="../reference/st_disaggregate.html">st_disaggregate()</a></code> might fail if geometries of input have M-dimension. This due to changes in <code>sf</code>-package version 1.0-13 associated with <code><a href="https://r-spatial.github.io/sf/reference/st_cast.html" class="external-link">st_cast()</a></code>, on which <code><a href="../reference/st_disaggregate.html">st_disaggregate()</a></code> is built. No quick fix yet.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.0.9003" id="sfhelpers-0009003">sfhelpers 0.0.0.9003<a class="anchor" aria-label="anchor" href="#sfhelpers-0009003"></a></h2>
 <ul><li>add function <code><a href="../reference/st_distance_along.html">st_distance_along()</a></code>.</li>

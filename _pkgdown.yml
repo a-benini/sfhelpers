@@ -12,9 +12,15 @@ reference:
       - st_disaggregate
       - st_distance_along
       - st_erase_robust
+      - st_layers_as_df
       - st_or
       - st_rbindlist
       - st_rename_geometry
+      - st_geometry_summary
+      - st_area_sum
+      - st_length_sum
+      - st_perimeter_sum
+      - st_perimeter_2d_sum
   - title: Datasets
     desc: ~
     contents:

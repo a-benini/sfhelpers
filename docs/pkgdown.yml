@@ -1,9 +1,9 @@
-pandoc: 2.19.2
+pandoc: 3.1.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   rbindlist_issues: rbindlist_issues.html
-last_built: 2023-02-08T12:42Z
+last_built: 2023-07-02T08:43Z
 urls:
   reference: https://a-benini.github.io/sfhelpers/reference
   article: https://a-benini.github.io/sfhelpers/articles

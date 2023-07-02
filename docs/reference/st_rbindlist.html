@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, <span class="va">...</span>, use_geometry <span class="op">=</span> <span class="cn">FALSE</span>, geometry_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, <span class="va">...</span>, geometry_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -90,15 +90,8 @@
 
 
 <dt>...</dt>
-<dd><p>arguments of the function <code><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></code>
+<dd><p>arguments of the function <code><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></code>
 except <code>l</code></p></dd>
-
-
-<dt>use_geometry</dt>
-<dd><p><code>TRUE</code> detects and binds the active list-columns
-with simple feature geometries separately, thus enabling matching of geometry
-columns differing by name as well as by position across the <code>list</code>ed sf
-objects.</p></dd>
 
 
 <dt>geometry_name</dt>
@@ -125,17 +118,15 @@ CRS</p></li>
 information on how to handle this <code>rbindlist</code> issue can be found
 <a href="https://github.com/Rdatatable/data.table/issues/4681" class="external-link">here</a>).</p></li>
 <li><p>allows binding <code>sf</code> objects with different geometry types</p></li>
-</ul><p>Remarks about matching geometry columns of input <code>sf</code> objects:</p><ul><li><p>If the geometry columns are identically named, but differ by position
-within
+</ul><p>Remarks about matching geometry columns of input <code>sf</code> objects:</p><ul><li><p>If the attribute columns are identically named, but differ by
+position within
 each <code>sf</code> object, set <code>use.names = TRUE</code> and <code>fill = TRUE</code>.</p></li>
-<li><p>If the geometry (and other) columns are differently named, but have
+<li><p>If the geometry and/or attribute columns are differently named, but
+have
 same position within every <code>sf</code> object, set <code>use.names = FALSE</code>.</p></li>
-<li><p>If the geometry columns are differently named and at the same time
-differently positioned, set <code>use_geometry = TRUE</code>. This detects the
-geometry columns and then matches them separately while the other columns
-can still be treated collectively by the arguments <code>use.names</code> and
-<code>fill</code>. Note that matching geometry columns separately requires more
-processing time.</p></li>
+<li><p>In any case the active geometry columns of the listed
+<code>sf</code>-objects are matched due to the identical internal naming of
+these columns.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -156,25 +147,28 @@ processing time.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">nc</span>, <span class="va">nc_new</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># list of sf-objects having differently named, but identically positioned</span></span></span>
-<span class="r-in"><span><span class="co"># geometry columns (attribute columns are also same-positioned and still</span></span></span>
-<span class="r-in"><span><span class="co"># same-named):</span></span></span>
-<span class="r-in"><span><span class="va">list_of_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_set_geometry</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"geom_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># such a list of sf-objects is easy to stack ...</span></span></span>
-<span class="r-in"><span><span class="va">nc_new_2</span> <span class="op">&lt;-</span> <span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">list_of_sf</span>, use.name <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># ... but by default the name of the returned geometry column ...</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">nc_new_2</span>, <span class="st">"sf_column"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "geom_1"</span>
-<span class="r-in"><span><span class="co"># ... is inherited from the first listed sf-object:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">nc_new_2</span>, <span class="st">"sf_column"</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">list_of_sf</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"sf_column"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span><span class="co"># user defined name of the stacked geometry column:</span></span></span>
-<span class="r-in"><span><span class="va">nc_new_3</span> <span class="op">&lt;-</span> <span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">list_of_sf</span>, use.name <span class="op">=</span> <span class="cn">FALSE</span>, geometry_name <span class="op">=</span> <span class="st">"geom"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">nc_new_3</span>, <span class="st">"sf_column"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "geom"</span>
+<span class="r-in"><span><span class="co"># a list of sf-objects having ...</span></span></span>
+<span class="r-in"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">nc</span><span class="op">[</span><span class="va">x</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">st_sf</a></span><span class="op">(</span><span class="op">)</span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># ... differently named, but identically positioned geometry &amp; attribute columns</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l</span>, <span class="va">names</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/transpose.html" class="external-link">t</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1]     [,2]          [,3]      [,4]    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] "AREA_1" "PERIMETER_1" "CNTY__1" "geom_1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] "AREA_2" "PERIMETER_2" "CNTY__2" "geom_2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] "AREA_3" "PERIMETER_3" "CNTY__3" "geom_3"</span>
+<span class="r-in"><span><span class="co"># by setting use.name = FALSE such a list of sf-objects is easy to stack:</span></span></span>
+<span class="r-in"><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, use.name <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 3 features and 3 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTIPOLYGON</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -81.74107 ymin: 36.23388 xmax: -80.43531 ymax: 36.58965</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  NAD27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   AREA_1 PERIMETER_1 CNTY__1                         geom_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.114       1.442    1825 MULTIPOLYGON (((-81.47276 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.061       1.231    1827 MULTIPOLYGON (((-81.23989 3...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.143       1.630    1828 MULTIPOLYGON (((-80.45634 3...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># from which listed element / sf-object do the stacked features originate?</span></span></span>
 <span class="r-in"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="va">nc</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, B <span class="op">=</span> <span class="cn">NULL</span>, C <span class="op">=</span> <span class="va">nc</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></span>
@@ -214,9 +208,8 @@ processing time.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l</span>, <span class="va">attr</span>, <span class="st">"sf_column"</span><span class="op">)</span> <span class="co"># geometry column names of listed sf-objects</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "geom_1" "geom_2" "geom_3"</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># ... requires use_geometry = TRUE for detecting and binding the geometry</span></span></span>
-<span class="r-in"><span><span class="co"># columns (separately from the attribute columns):</span></span></span>
-<span class="r-in"><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, use.name <span class="op">=</span> <span class="cn">TRUE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span>, idcol <span class="op">=</span> <span class="cn">TRUE</span>, use_geometry <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># ... can be handled also by setting use.name = TRUE and fill = TRUE:</span></span></span>
+<span class="r-in"><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, use.name <span class="op">=</span> <span class="cn">TRUE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span>, idcol <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 3 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTIPOLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
@@ -226,18 +219,19 @@ processing time.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   1    NA        NA    NA MULTIPOLYGON (((-81.47276 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 0.061        NA    NA MULTIPOLYGON (((-81.23989 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3   3    NA      1.63  1828 MULTIPOLYGON (((-80.45634 3...</span>
+<span class="r-in"><span><span class="co"># this works because st_rbindlist() internally renames all active geometry columns identically!</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># note: if use_geometry = TRUE, the name of the returned geometry column ...</span></span></span>
-<span class="r-in"><span><span class="co"># ... is by default inherited from the first listed sf-object. The user ...</span></span></span>
+<span class="r-in"><span><span class="co"># note: as shown above the name of the returned geometry column ...</span></span></span>
+<span class="r-in"><span><span class="co"># ... is inherited by default from the first listed sf-object. The user ...</span></span></span>
 <span class="r-in"><span><span class="co"># ... can set an alternative geometry column name:</span></span></span>
-<span class="r-in"><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, use.name <span class="op">=</span> <span class="cn">TRUE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span>, idcol <span class="op">=</span> <span class="cn">TRUE</span>, use_geometry <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>             geometry_name <span class="op">=</span> <span class="st">"geom"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">st_rbindlist</span><span class="op">(</span><span class="va">l</span>, use.name <span class="op">=</span> <span class="cn">TRUE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span>, idcol <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>            geometry_name <span class="op">=</span> <span class="st">"geom_named_by_user"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 3 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTIPOLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -81.74107 ymin: 36.23388 xmax: -80.43531 ymax: 36.58965</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  NAD27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .id  AREA PERIMETER CNTY_                           geom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .id  AREA PERIMETER CNTY_             geom_named_by_user</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   1    NA        NA    NA MULTIPOLYGON (((-81.47276 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 0.061        NA    NA MULTIPOLYGON (((-81.23989 3...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3   3    NA      1.63  1828 MULTIPOLYGON (((-80.45634 3...</span>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_erase_robust</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, check_overlap <span class="op">=</span> <span class="cn">FALSE</span>, use_st_combine <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_erase_robust</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -91,20 +91,6 @@
 
 <dt>y</dt>
 <dd><p>object of class <code>sf</code>, <code>sfc</code> or <code>sfg</code></p></dd>
-
-
-<dt>check_overlap</dt>
-<dd><p><code>TRUE</code> detects those geometries included in
-<code>x</code> and <code>y</code> which overlap with the other input layer and applies
-geometric operations only on these; <code>FALSE</code> (default) applies geometric
-operations on all geometries (s. Details).</p></dd>
-
-
-<dt>use_st_combine</dt>
-<dd><p><code>TRUE</code> (default) applies internally
-<code>st_union(st_combine())</code> to <code>y</code>; <code>FALSE</code> leaves out
-<code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></code> and only uses <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></code>, which
-might be slower, but more reliable (s. Details).</p></dd>
 
 
 <dt>...</dt>
@@ -128,39 +114,24 @@ operations on pairs of simple feature geometry sets
 erases all parts from geometry set <code>x</code> overlapped by geometry set <code>y</code>.
 This function sometimes works as expected, sometimes it doesn't. (s. examples
 below).</p>
-<p>Even when both input layers <code>x</code> and <code>y</code> consist of valid
-geometries (which can be checked with <code><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_is_valid</a></code>,
-respectively fixed with <code><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></code>), the a. m. helper
-function can still throw an error. This is often due to internally applying
-<code>st_union(st_combine())</code> to <code>y</code>. So, currently
-<code>st_erase_robust()</code> uses in case of failure as a second option
-<code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></code> only. Leaving out <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></code>
-may very well add to the complexity of the involved geometries; thus the
-second option may be rather slow. For this reason, if the coordinates of the
-input are longlat degrees, setting <code><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></code> to
-<code>FALSE</code> can help to speed up <code>st_erase_robust()</code> (s.examples below).</p>
-<p>Note that with the recent versions of <code>sf</code> (&gt;= 1.0-1), although
-<code>st_union(st_combine())</code> may very well return invalid geometries,
-experience made so far shows that this has become less of an obstacle to
-further prepossessing with <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_difference</a></code>. Nonetheless, sometimes
-the default internal use of <code>st_union(st_combine())</code> (<code>use_st_combine</code>
-= <code>TRUE</code>) results in an improper erase. By setting <code>use_st_combine</code>
-= <code>FALSE</code> applying only <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union()</a></code> to <code>y</code> can be enforced,
-which erases more reliably, but at the cost of longer run time.</p>
-<p>In case of a significant proportion of non-overlapping geometries, setting
-<code>check_overlap</code> to <code>TRUE</code> can shorten run time. As the internal
-distinction of overlapping and non-overlapping geometries relies on
-<code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></code>, which itself is time consuming,
-<code>check_overlap = TRUE</code> involves a trade off: If all geometries overlap,
-<code>check_overlap = TRUE</code> will only increase the run time. On the other
-hand, the higher the proportion of non-overlapping geometries, the more this
-argument specification shortens the processing time by leaving out
-unnecessary geometric operations. Ideally the user has previous knowledge
-about how little or how much the input layers <code>x</code> and <code>y</code> overlap
-with each other in order to apply <code>check_overlap</code> in a informed way. In
-general, setting <code>check_overlap</code> to <code>TRUE</code> is advantageous when
-<code>x</code> or <code>y</code> are large geometry sets and include more complex
-geometries.</p>
+<p>Even when both input layers <code>x</code> and <code>y</code> consist of valid geometries
+(which can be checked with <code><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_is_valid</a></code>, respectively fixed
+with <code><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></code>), the a. m. helper function can still
+throw an error. This is often due to internally applying
+<code>st_union(st_combine())</code> to <code>y</code>. <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></code> is
+sometimes also the cause for returning incorrectly erased geometry. To avoid
+these issues, <code>st_erase_robust()</code> uses <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></code> only.
+Leaving out <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine()</a></code> may add to the complexity of the
+involved geometries, thus potentially increasing the run time. To counteract
+this, <code>st_erase_robust()</code> detects with the help of
+<code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></code> which geometries from the input <code>x</code> and
+<code>y</code> overlap with those of the other layer and applies geometric
+operations only to such geometries.</p>
+<p>When using the helper function from the a.m. <code>sf</code> help page with input
+having longlat degrees CRS, switching off spherical geometry (s2) by setting
+<code><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></code> to <code>FALSE</code> can help to overcome issues.
+But this isn't a safe workaround for all issues caused by <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine()</a></code>
+when it comes to erasing.</p>
     </div>
 
     <div id="ref-examples">
@@ -168,9 +139,7 @@ geometries.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># find code of helper function st_erase():</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="op">?</span><span class="va">geos_binary_ops</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># ?geos_binary_ops</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># copy function code:</span></span></span>
 <span class="r-in"><span><span class="va">st_erase</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_difference</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -185,33 +154,18 @@ geometries.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># check if helper function works with demo data:</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu">st_erase</span><span class="op">(</span><span class="va">grid</span>, <span class="va">nc</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">st_erase</span><span class="op">(</span><span class="va">grid</span>, <span class="va">nc</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in wk_handle.wk_wkb(wkb, s2_geography_writer(oriented = oriented,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Loop 0 edge 21 has duplicate near loop 20 edge 6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># internal processing of input y (nc) returns the same error as st_erase():</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in wk_handle.wk_wkb(wkb, s2_geography_writer(oriented = oriented,  : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Loop 0 edge 21 has duplicate near loop 20 edge 6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># st_erase_robust() can handle this:</span></span></span>
 <span class="r-in"><span><span class="fu">st_erase_robust</span><span class="op">(</span><span class="va">grid</span>, <span class="va">nc</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="st_erase_robust-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co"># if spherical geometry (s2) is switched off,</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Spherical geometry (s2) switched off</span>
-<span class="r-in"><span><span class="co"># sfhelpers::st_erase_robust() &amp; helper function st_erase() should work and</span></span></span>
-<span class="r-in"><span><span class="co"># return the same (st_erase() might still not work on some Linux operation</span></span></span>
-<span class="r-in"><span><span class="co"># systems):</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> <span class="fu">st_erase_robust</span><span class="op">(</span><span class="va">grid</span>, <span class="va">nc</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> <span class="fu">st_erase</span><span class="op">(</span><span class="va">grid</span>, <span class="va">nc</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># because internal handling of input y (nc) won't throw an error:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>

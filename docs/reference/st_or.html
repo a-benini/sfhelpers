@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
       </span>
     </div>
 
@@ -80,16 +80,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_or</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  <span class="va">y</span>,</span>
-<span>  dim <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".x"</span>, <span class="st">".y"</span><span class="op">)</span>,</span>
-<span>  suffix.all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  check_overlap <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  use_st_combine <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">st_or</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, dim <span class="op">=</span> <span class="fl">2</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".x"</span>, <span class="st">".y"</span><span class="op">)</span>, suffix.all <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -109,28 +100,15 @@ surfaces.</p></dd>
 
 
 <dt>suffix</dt>
-<dd><p>length 2 character vector (default <code>c(".x", ".y")</code>) attached as
-suffix to attribute headings inherited from argument <code>x</code> resp. from <code>y</code></p></dd>
+<dd><p>length 2 character vector (default <code>c(".x", ".y")</code>)
+attached as suffix to attribute headings inherited from argument <code>x</code>
+resp. from <code>y</code></p></dd>
 
 
 <dt>suffix.all</dt>
 <dd><p><code>TRUE</code> suffixes all attribute headings inherited from
-arguments <code>x</code> and <code>y</code> according to <code>suffix</code>; <code>FALSE</code> (default)
-suffixes only homonymous attribute headings.</p></dd>
-
-
-<dt>check_overlap</dt>
-<dd><p><code>TRUE</code> detects those geometries included in
-<code>x</code> and <code>y</code> which overlap with the other input layer and applies
-geometric operations only on these; <code>FALSE</code> (default) applies geometric
-operations on all geometries (s. Details).</p></dd>
-
-
-<dt>use_st_combine</dt>
-<dd><p><code>TRUE</code> (default) applies internally
-<code>st_union(st_combine())</code> to <code>x</code> and <code>y</code>; <code>FALSE</code> leaves out
-<code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_combine</a></code> and only uses <code><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></code>, which
-might be slower, but more reliable (s. Details of <code><a href="st_erase_robust.html">st_erase_robust</a></code>).</p></dd>
+arguments <code>x</code> and <code>y</code> according to <code>suffix</code>; <code>FALSE</code>
+(default) suffixes only homonymous attribute headings.</p></dd>
 
 
 <dt>...</dt>
@@ -160,25 +138,10 @@ geometry sets (s. below examples)</p></li>
 corresponding to the geometry set they originated from (s. below examples)</p></li>
 <li><p>handling of input layers with differently named geometry columns
 and/or being totally overlapped by the other input layer.</p></li>
-<li><p>optional restriction of the geometric operations to geometries of the
-input layers <code>x</code> and <code>y</code> overlapping those of the other input
-layer (argument <code>check_overlap = TRUE</code>). In case of a significant
-proportion of non-overlapping geometries, this can shorten run time. As the
-internal distinction of overlapping and non-overlapping geometries relies
-on <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></code>, which itself is time consuming, setting
-<code>check_overlap</code> to <code>TRUE</code> involves a trade off: If all geometries
-overlap, <code>check_overlap = TRUE</code> will only increase the run time. On
-the other hand, the higher the proportion of non-overlapping geometries,
-the more this argument specification shortens the processing time by
-leaving out unnecessary geometric operations. Ideally the user has previous
-knowledge about how little or how much the input layers <code>x</code> and
-<code>y</code> overlap with each other in order to apply <code>check_overlap</code> in
-a informed way.</p></li>
-</ul><p>If the coordinates of the input are longlat degrees, setting
-<code><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></code> to <code>FALSE</code> can help to speed up
-<code><a href="st_erase_robust.html">st_erase_robust()</a></code> and thus also <code>st_or()</code>. For information on
-this see details and examples sections of <code><a href="st_erase_robust.html">st_erase_robust</a></code>.</p>
-    </div>
+<li><p>restricts geometric operations to geometries of the input layers
+<code>x</code> and <code>y</code> overlapping those of the other input
+layer (same as <code><a href="st_erase_robust.html">st_erase_robust</a></code>).</p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>

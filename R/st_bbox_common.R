@@ -12,37 +12,41 @@
 #'
 #' @examples
 #' library(sf)
-#' library(sp)
-#' library(raster)
 #' library(stars)
 #' library(terra)
-#' nc <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
 #'
-#' # create spatial objects of different classes and extent:
-#' sf    <- nc[4:8, ]
-#' sp    <- sf::as_Spatial(nc[96:100, ])
-#' logo  <- raster(system.file("external/rlogo.grd", package = "raster")) %>% as.matrix()
-#' rast  <- rast(logo, extent = c(-77.5, -76, 33, 34.5), crs = st_crs(sf)$wkt)
-#' stars <- st_as_stars(rast) %>% st_set_bbox(., st_bbox(.) + rep(c(1.5, 0), 2)) %>% st_flip()
-#' r     <- raster(rast) %>% setExtent(., extent(.) + rep(1.5, 4))
+#' # get /create spatial objects of different classes and extent:
+#' sf <- st_read(system.file("gpkg/nc.gpkg", package = "sf"), quiet = TRUE)
+#' logo <- rast(system.file("ex/logo.tif", package = "terra"))
+#' rast <- rast(
+#'   val    = as.vector(logo$red),
+#'   nrows  = nrow(logo),
+#'   ncols  = ncol(logo),
+#'   extent = c(-77, -75, 33, 35),
+#'   crs    = st_crs(sf)$wkt
+#'   )
+#' stars <- st_as_stars(rast) %>% st_set_bbox(., st_bbox(.) + rep(2, 4)) %>% st_flip()
 #'
 #' # common extent / bbox:
-#' (bbox_common <- st_bbox_common(sf, sp, rast, stars, r))
+#' (bbox_common <- st_bbox_common(sf, rast, stars))
 #'
 #' # map objects within their common extent:
 #' library(tmap)
-#' tm_shape(rast, bbox = bbox_common) + tm_raster(title = "rast", style = "cont") +
-#'   tm_shape(stars) + tm_raster(title = "stars", style = "cont", palette = "viridis") +
-#'   tm_shape(r) + tm_raster(title = "r", style = "cont", palette = "Spectral") +
-#'   tm_shape(sf) + tm_borders() +
-#'   tm_shape(sp) + tm_borders(col = "red")
+#' tm_shape(stars, bbox = bbox_common) +
+#'   tm_raster(title = "stars", style = "cont", palette = "Spectral") +
+#'   tm_shape(rast) +
+#'   tm_raster(title = "SpatRaster", style = "cont", palette = "viridis") +
+#'   tm_shape(sf) + tm_borders(col = "magenta") +
+#'   tm_layout(legend.stack = "horizontal", legend.position = c(0.05, 0.05))
 #'
-#' l <- lapply(1:nrow(nc), function(x) nc[x, ])
+#' # list of sf objects
+#' l <- lapply(1:nrow(sf), function(x) sf[x, ])
 #'
+#' # bbox of all listed sf objects
 #' st_bbox_list(l)
 #'
-#' # the bbox of the original geometry set (nc) and the bbox of its listed objects are identical:
-#' all.equal(st_bbox_list(l), st_bbox(nc))
+#' # the bbox of the original geometry set (sf) and the bbox of its listed objects are identical:
+#' all.equal(st_bbox_list(l), st_bbox(sf))
 #'
 #' @export st_bbox_common
 st_bbox_common <- function(...) {

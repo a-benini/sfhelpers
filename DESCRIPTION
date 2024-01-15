@@ -25,9 +25,7 @@ Imports:
 Suggests: 
     dplyr,
     knitr,
-    raster,
     rmarkdown,
-    sp,
     stars,
     terra,
     testthat (>= 3.0.0),

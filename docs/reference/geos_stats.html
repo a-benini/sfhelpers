@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9005</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@ type(s). If a function of the type <code>st_measure_sum()</code> is executed, th
 included in <code>x</code> is returned, if specified in a certain unit and rounded
 by given digits (see
 <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></code>, <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_length</a></code>,
-<code><a href="https://rdrr.io/pkg/lwgeom/man/perimeter.html" class="external-link">st_perimeter</a></code> resp.
+<code>st_perimeter</code> resp.
 <code><a href="https://rdrr.io/pkg/lwgeom/man/perimeter.html" class="external-link">st_perimeter_2d</a></code>).</p>
     </div>
 
@@ -158,7 +158,7 @@ by given digits (see
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># specifying only units doesn't effect comparison:</span></span></span>
 <span class="r-in"><span><span class="fu">st_area_sum</span><span class="op">(</span><span class="va">polygons</span>, <span class="st">"km^2"</span><span class="op">)</span> <span class="op">==</span> <span class="fu">st_area_sum</span><span class="op">(</span><span class="va">polygons</span>, <span class="st">"ha"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span><span class="co"># but setting units and rounding by digits argument can mess up comparison:</span></span></span>
 <span class="r-in"><span><span class="fu">st_area_sum</span><span class="op">(</span><span class="va">polygons</span>, <span class="st">"km^2"</span><span class="op">)</span> <span class="op">==</span> <span class="fu">st_area_sum</span><span class="op">(</span><span class="va">polygons</span>, <span class="st">"ha"</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>

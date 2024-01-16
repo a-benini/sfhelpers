@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9005</span>
       </span>
     </div>
 
@@ -102,27 +102,24 @@
 <div class="section level2">
 <h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a>
 </h2>
-<p><code>sfhelpers</code> is a R package including functions helping to run routines related primarily to simple features (<a href="https://cran.r-project.org/web/packages/sf/index.html" class="external-link"><code>sf</code></a>) , but also to spatial objects of other classes / packages ( <a href="https://cran.r-project.org/web/packages/raster/index.html" class="external-link"><code>raster</code></a>, <a href="https://cran.r-project.org/web/packages/sp/index.html" class="external-link"><code>sp</code></a>, <a href="https://cran.r-project.org/web/packages/stars/index.html" class="external-link"><code>stars</code></a>, <a href="https://cran.r-project.org/web/packages/terra/index.html" class="external-link"><code>terra</code></a> ). <code>sfhelpers</code> is motivated by multiple requests for code or advice related to <code>sf</code>. By publishing <code>sfhelpers</code> I hope to at least partly satisfy these demands. <code>sfhelpers</code> is still very much in the development phase; it may or may not go any further. Suggestions are welcome.</p>
+<p><code>sfhelpers</code> is a R package including functions helping to run routines related primarily to simple features (<a href="https://cran.r-project.org/web/packages/sf/index.html" class="external-link"><code>sf</code></a>) , but also to spatial objects of other classes / packages ( <a href="https://cran.r-project.org/web/packages/stars/index.html" class="external-link"><code>stars</code></a>, <a href="https://cran.r-project.org/web/packages/terra/index.html" class="external-link"><code>terra</code></a> ). <code>sfhelpers</code> is motivated by multiple requests for code or advice related to <code>sf</code>. By publishing <code>sfhelpers</code> I hope to at least partly satisfy these demands. <code>sfhelpers</code> is still very much in the development phase; it may or may not go any further. Suggestions are welcome.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install package devtools if not yet installed</span></span>
-<span><span class="co"># install.packages("devtools")</span></span>
+<code class="sourceCode R"><span><span class="co"># install package remotes if not yet installed</span></span>
+<span><span class="co"># install.packages("remotes")</span></span>
 <span></span>
 <span><span class="co"># install fast from GitHub without vignettes (not recommended)</span></span>
-<span><span class="co">#   devtools::install_github("a-benini/sfhelpers")</span></span>
+<span><span class="co"># remotes::install_github("a-benini/sfhelpers")</span></span>
 <span></span>
 <span><span class="co"># recommended: installation from GitHub including vignettes:</span></span>
-<span> <span class="va">pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"magrittr"</span>, <span class="st">"dplyr"</span><span class="op">)</span></span>
-<span> <span class="co"># packages required to build sfhelpers's vignettes from GitHup repository</span></span>
-<span> <span class="va">new_pkgs_4_vignettes</span> <span class="op">&lt;-</span> <span class="va">pkgs_4_vignettes</span><span class="op">[</span><span class="op">!</span><span class="va">pkgs_4_vignettes</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">]</span></span>
-<span> <span class="co"># among these packages the ones not yet installed</span></span>
-<span> <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="va">new_pkgs_4_vignettes</span><span class="op">)</span><span class="op">}</span></span>
-<span> <span class="co"># install the still missing packages</span></span>
-<span> <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"a-benini/sfhelpers"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span> <span class="co"># install sfhelpers from GitHup with its vignettes</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span></span>
+<span>  <span class="st">"a-benini/sfhelpers"</span>,</span>
+<span>  build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Imports"</span>, <span class="st">"Suggests"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -133,7 +130,7 @@
 <div class="section level2">
 <h2 id="usage-example">Usage Example<a class="anchor" aria-label="anchor" href="#usage-example"></a>
 </h2>
-<p><code><a href="reference/st_or.html">sfhelpers::st_or</a></code> is a <code>sf</code> equivalent of QGIS Union. <code>st_or</code> returns a geometry set containing overlapping and non-overlapping parts of two input <code>sf</code> objects (or <code>sfc</code>s).</p>
+<p><a href="https://a-benini.github.io/sfhelpers/reference/st_or.html"><code>sfhelpers::st_or()</code></a> is a <code>sf</code> equivalent of QGIS Union. <code><a href="reference/st_or.html">st_or()</a></code> returns a geometry set containing overlapping and non-overlapping parts of two input <code>sf</code> objects (or <code>sfc</code>s).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1; sf_use_s2() is TRUE</span></span>

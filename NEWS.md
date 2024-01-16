@@ -1,3 +1,7 @@
+# sfhelpers 0.0.0.9005
+* improve README and help pages.
+* remove `raster` and `sp` from the suggested packages.
+
 # sfhelpers 0.0.0.9004
 * add summary statistical functions for `sfg`, `sfc` and `sf` objects: 
   - `st_geometry_summary()`

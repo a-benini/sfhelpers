@@ -6,7 +6,7 @@
 \alias{sfhelpers-package}
 \title{sfhelpers: Helper Functions for Wrapping Simple Features-Related Routines}
 \description{
-Functions helping to run routines related primarily to simple features (sf), but also to spatial objects of other classes / packages (raster, sp, stars).
+Functions helping to run routines related primarily to simple features (sf), but also to spatial objects of other classes / packages (terra, stars).
 }
 \seealso{
 Useful links:

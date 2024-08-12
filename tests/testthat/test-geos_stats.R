@@ -75,10 +75,6 @@ test_that("test-geos_stats", {
   expect_true(st_is_longlat(nc))
 
   expect_error(
-    st_perimeter_sum(nc)
-  )
-
-  expect_error(
     st_perimeter_2d_sum(st_geometry(nc))
   )
 })

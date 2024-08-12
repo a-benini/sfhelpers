@@ -19,7 +19,7 @@ Imports:
     data.table,
     lifecycle,
     lwgeom,
-    sf (>= 1.0.6),
+    sf (>= 1.0.15),
     tmaptools,
     uuid
 Suggests: 

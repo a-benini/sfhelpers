@@ -9,11 +9,11 @@
 #' included in \code{x} is returned, if specified in a certain unit and rounded
 #' by given digits (see
 #' \code{\link[sf]{st_area}}, \code{\link[sf]{st_length}},
-#' \code{\link[lwgeom]{st_perimeter}} resp.
+#' \code{\link[sf]{st_perimeter}} resp.
 #' \code{\link[lwgeom]{st_perimeter_2d}}).
 #'
-#' @importFrom lwgeom st_perimeter st_perimeter_2d
-#' @importFrom sf st_area st_geometry_type st_length st_is_longlat
+#' @importFrom lwgeom  st_perimeter_2d
+#' @importFrom sf st_area st_geometry_type st_length st_is_longlat st_perimeter
 #'
 #' @examples
 #' library(sf)
@@ -45,7 +45,7 @@
 #' # similarly if returns are used in further calculations then don't specify
 #' # the digits to avoid passing on rounding errors
 #' (ratio <- st_perimeter_sum(polygons) / st_area_sum(polygons, "ha"))
-#' # rounding cant be done later on
+#' # rounding can be done later on
 #' round(ratio)
 #' @name geos_stats
 #' @export
@@ -75,14 +75,13 @@ st_length_sum <- function(x, value, digits, ...){
 }
 #' @name geos_stats
 #' @export
-st_perimeter_sum <- function(x, value, digits){
-  check_4_st_perimeter_sum(x)
-  st_measures_sum(fun = lwgeom::st_perimeter, x = x, value = value, digits = digits)
+st_perimeter_sum <- function(x, value, digits, ...){
+  st_measures_sum(fun = sf::st_perimeter, x = x, value = value, digits = digits, ...)
 }
 #' @name geos_stats
 #' @export
 st_perimeter_2d_sum <- function(x, value, digits){
-  check_4_st_perimeter_sum(x)
+  check_4_st_perimeter_2d_sum(x)
   st_measures_sum(fun = lwgeom::st_perimeter_2d, x = x, value = value, digits = digits)
 }
 # helper functions for pkg-internal use
@@ -102,7 +101,7 @@ check_sf_sfc_sfg <- function(x){
     stop("the argument x must be of the class sf, sfc or sfg", call. = TRUE)
   }
 }
-check_4_st_perimeter_sum <- function(x){
+check_4_st_perimeter_2d_sum <- function(x){
   if(inherits(x, c("sf", "sfc", "sfg"))){
     if (isTRUE(sf::st_is_longlat(x))){
       stop("for perimeter of longlat geometry, cast to LINESTRING and use st_length_sum")

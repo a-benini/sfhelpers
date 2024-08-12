@@ -15,7 +15,7 @@ st_area_sum(x, value, digits, ...)
 
 st_length_sum(x, value, digits, ...)
 
-st_perimeter_sum(x, value, digits)
+st_perimeter_sum(x, value, digits, ...)
 
 st_perimeter_2d_sum(x, value, digits)
 }
@@ -40,7 +40,7 @@ type(s). If a function of the type \code{st_measure_sum()} is executed, the
 included in \code{x} is returned, if specified in a certain unit and rounded
 by given digits (see
 \code{\link[sf]{st_area}}, \code{\link[sf]{st_length}},
-\code{\link[lwgeom]{st_perimeter}} resp.
+\code{\link[sf]{st_perimeter}} resp.
 \code{\link[lwgeom]{st_perimeter_2d}}).
 }
 \description{
@@ -76,6 +76,6 @@ st_area_sum(polygons, "km^2", 2) == st_area_sum(polygons, "ha", 0)
 # similarly if returns are used in further calculations then don't specify
 # the digits to avoid passing on rounding errors
 (ratio <- st_perimeter_sum(polygons) / st_area_sum(polygons, "ha"))
-# rounding cant be done later on
+# rounding can be done later on
 round(ratio)
 }

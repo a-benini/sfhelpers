@@ -47,8 +47,6 @@
 #' (ratio <- st_perimeter_sum(polygons) / st_area_sum(polygons, "ha"))
 #' # rounding can be done later on
 #' round(ratio)
-#' @name geos_stats
-#' @export
 #' @param value object of class \code{units} or \code{symbolic_units} (see
 #' examples section of \code{\link[units]{units}}\code{() <- value}),
 #' optional: if unspecified, the default unit of the output is returned
@@ -56,30 +54,30 @@
 #' \code{\link[base]{round}}), optional: if unspecified, the output is not
 #' rounded
 #' @param ... passed on to \code{\link[s2]{s2_distance}} or \code{\link[s2]{s2_distance_matrix}}
-#' @name geos_stats
 #' @export
+#' @name geos_stats
 st_geometry_summary <- function(x){
   check_sf_sfc_sfg(x)
   y <- summary(sf::st_geometry_type(x))
   y[y > 0]
 }
-#' @name geos_stats
 #' @export
+#' @rdname geos_stats
 st_area_sum <- function(x, value, digits, ...){
   st_measures_sum(fun = sf::st_area, x = x, value = value, digits = digits, ...)
 }
-#' @name geos_stats
 #' @export
+#' @rdname geos_stats
 st_length_sum <- function(x, value, digits, ...){
   st_measures_sum(fun = sf::st_length, x = x, value = value, digits = digits, ...)
 }
-#' @name geos_stats
 #' @export
+#' @rdname geos_stats
 st_perimeter_sum <- function(x, value, digits, ...){
   st_measures_sum(fun = sf::st_perimeter, x = x, value = value, digits = digits, ...)
 }
-#' @name geos_stats
 #' @export
+#' @rdname geos_stats
 st_perimeter_2d_sum <- function(x, value, digits){
   check_4_st_perimeter_2d_sum(x)
   st_measures_sum(fun = lwgeom::st_perimeter_2d, x = x, value = value, digits = digits)

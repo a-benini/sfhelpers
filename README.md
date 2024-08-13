@@ -27,7 +27,7 @@ it may or may not go any further. Suggestions are welcome.
 remotes::install_github(
   "a-benini/sfhelpers",
   build_vignettes = TRUE,
-  dependencies = c("Imports", "Suggests")
+  dependencies = TRUE
   )
 ```
 
@@ -46,7 +46,7 @@ objects (or `sfc`s).
 
 ``` r
 library(sf)
-#> Linking to GEOS 3.9.1, GDAL 3.3.2, PROJ 8.1.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
 library(sfhelpers)
 
 # the two included demo sf-objects have partly identically named attribute columns

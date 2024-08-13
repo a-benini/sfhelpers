@@ -40,7 +40,7 @@ any further. Suggestions are welcome.
 remotes::install_github(
   "a-benini/sfhelpers",
   build_vignettes = TRUE,
-  dependencies = c("Imports", "Suggests")
+  dependencies = TRUE
   )
 ```
 

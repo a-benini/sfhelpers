@@ -1,3 +1,7 @@
+# sfhelpers 0.0.0.9006
+* replace `lwgeom::st_perimeter()` by `sf::st_perimeter()` / update to `sf` >= 1.0.15.
+* minor improvements.
+
 # sfhelpers 0.0.0.9005
 * improve README and help pages.
 * remove `raster` and `sp` from the suggested packages.

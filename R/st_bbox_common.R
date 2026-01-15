@@ -41,11 +41,27 @@
 #' # map objects within their common extent:
 #' library(tmap)
 #' tm_shape(stars, bbox = bbox_common) +
-#'   tm_raster(title = "stars", style = "cont", palette = "Spectral") +
+#' tm_raster(
+#'   col.scale = tm_scale_continuous(values = "brewer.spectral"),
+#'   col.legend = tm_legend(
+#'     title    = "stars",
+#'     frame    = FALSE,
+#'     reverse  = TRUE,
+#'     height   = 10,
+#'     position = tm_pos_in("left", "bottom")
+#'   )) +
 #'   tm_shape(rast) +
-#'   tm_raster(title = "SpatRaster", style = "cont", palette = "viridis") +
+#'   tm_raster(
+#'     col.scale = tm_scale_continuous(values = "viridis"),
+#'     col.legend = tm_legend(
+#'       title    = "SpatRaster",
+#'       frame    = FALSE,
+#'       reverse  = TRUE,
+#'       height   = 10,
+#'       position = tm_pos_in("left", "bottom")
+#'     )) +
 #'   tm_shape(sf) + tm_borders(col = "magenta") +
-#'   tm_layout(legend.stack = "horizontal", legend.position = c(0.05, 0.05))
+#'   tm_layout(legend.stack = "horizontal")
 #'
 #' # list of sf objects
 #' l <- lapply(1:nrow(sf), function(x) sf[x, ])

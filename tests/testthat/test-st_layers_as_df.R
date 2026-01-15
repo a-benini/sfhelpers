@@ -26,7 +26,7 @@ test_that("test-st_layers_as_df", {
     st_layers_as_df(dsn, wrong_arg = "TRUE")
   )
 
-  sf_layers$name <- character(0)
+  sf_layers$name <- NULL
   expect_warning(st_layers_as_df(sf_layers))
   expect_null(st_layers_as_df(sf_layers, warn = FALSE))
 

@@ -3,11 +3,15 @@
 \name{st_bbox_common}
 \alias{st_bbox_common}
 \alias{st_bbox_list}
-\title{Return common bounding of multiple spatial objects}
+\alias{st_bbox_aligned}
+\title{Return common bounding of multiple spatial objects or aligned bounding of
+single spatial object}
 \usage{
 st_bbox_common(...)
 
 st_bbox_list(l)
+
+st_bbox_aligned(obj, alignment)
 }
 \arguments{
 \item{...}{objects that can be coerced to bounding boxes with
@@ -15,14 +19,28 @@ st_bbox_list(l)
 
 \item{l}{\code{list} of objects that can be coerced to bounding boxes with
 \code{\link[tmaptools]{bb}} or with \code{\link[sf]{st_bbox}}}
+
+\item{obj}{any object that can be coerced to a bounding box with
+\code{\link[sf]{st_bbox}}}
+
+\item{alignment}{single positive numeric value, corresponding to the units of
+the CRS, which the input \code{obj}ect has.}
 }
 \value{
 object of the class \code{bbox} equal to the return of
-\code{\link[sf]{st_bbox}} but representing the common bounding of several
-input (\code{list}ed) objects
+\code{\link[sf]{st_bbox}} representing in the case of
+\itemize{
+\item \code{st_bbox_common()} or \code{st_bbox_list()} the common bounding
+of several (\code{list}ed) input objects
+\item \code{st_bbox_aligned()} the aligned bounding of a single input object.
+Returned values \code{xmin}, \code{ymin}, \code{xmax} and \code{ymax} match
+\eqn{k} \eqn{\cdot} \code{alignment}-argument, where \eqn{k} is an integer.
+The input \code{obj}ect is positioned within these four coordinates.
+}
 }
 \description{
-Return common bounding of multiple spatial objects
+Return common bounding of multiple spatial objects or aligned bounding of
+single spatial object
 }
 \examples{
 library(sf)
@@ -61,5 +79,18 @@ st_bbox_list(l)
 
 # the bbox of the original geometry set (sf) and the bbox of its listed objects are identical:
 all.equal(st_bbox_list(l), st_bbox(sf))
+
+# get pretty / aligned bbox of an object
+(bb_aligned <- st_bbox_aligned(sf, alignment = 2.5))
+
+# dividing the aligned bbox by the alignment value results in integer values
+bb_aligned / 2.5
+
+# plot used object within extent of aligned bbox
+plot(st_geometry(sf), extent = bb_aligned, col = "gray")
+
+# add to plot grid matching the alignment (= cellsize)
+grid_aligned <- st_make_grid(bb_aligned, cellsize = 2.5)
+plot(grid_aligned, border = "red", lwd = 2, add = TRUE)
 
 }

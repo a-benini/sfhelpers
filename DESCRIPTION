@@ -1,6 +1,6 @@
 Package: sfhelpers
 Title: Helper Functions for Wrapping Simple Features-Related Routines
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Authors@R: 
     person("Attilio", "Benini", email = "attilio.benini@gmx.net", role = c("aut", "cre"))
 Author: Attilio Benini [aut, cre]

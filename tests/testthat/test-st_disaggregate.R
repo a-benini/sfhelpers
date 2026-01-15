@@ -204,15 +204,15 @@ test_that("test-st_disaggregate", {
 
   xyzm_sfc <- st_sfc(st_multipoint(c(xyzm_1, xyzm_2)), xyzm_3)
   # due to changes in sf-package version 1.0-13 this test doesn't work any more ...
-  # expect_equal(
-  #   st_disaggregate(xyzm_sfc),
-  #   st_sfc(xyzm_1, xyzm_2)
-  # )
+  expect_equal(
+    st_disaggregate(xyzm_sfc),
+    st_sfc(xyzm_1, xyzm_2)
+  )
   # ... because now an error associated with sf::cast() is returned
   # "Error: GEOS does not support XYM or XYZM geometries; use st_zm() to drop M"
   try_1 <- try(st_disaggregate(xyzm_sfc), silent = TRUE) %>% as.character()
   try_2 <- try(st_cast(xyzm_sfc, "MULTIPOINT"), silent = TRUE) %>% as.character()
-  expect_equal(try_1, try_2)
+  # expect_equal(try_1, try_2)
 
   # the M-dimension is clearly the issue fore if it is no there everything works fine
   xyz_1 <- st_point(rep(0, 3))

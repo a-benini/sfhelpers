@@ -1,6 +1,11 @@
 
 # sfhelpers
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## Purpose
 
 `sfhelpers` is a R package including functions helping to run routines
@@ -46,7 +51,7 @@ objects (or `sfc`s).
 
 ``` r
 library(sf)
-#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
+#> Linking to GEOS 3.13.1, GDAL 3.11.4, PROJ 9.7.0; sf_use_s2() is TRUE
 library(sfhelpers)
 
 # the two included demo sf-objects have partly identically named attribute columns
@@ -85,7 +90,7 @@ st_or(poly_1, poly_2) %>% plot()
 #> all geometries
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+<img src="man/figures/README-example-1.png" alt="" width="100%" />
 
 For the rest of the functions included in `sfhelpers` see
 [here](https://a-benini.github.io/sfhelpers/reference/index.html).

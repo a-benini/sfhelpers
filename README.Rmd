@@ -13,6 +13,10 @@ knitr::opts_chunk$set(
 
 # sfhelpers
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## Purpose
 
 `sfhelpers` is a R package including functions helping to run routines related

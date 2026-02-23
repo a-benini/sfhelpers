@@ -138,4 +138,22 @@ test_that("test-st_or", {
     st_or(A, B, dim = c(0, 1)), # returns points & lines
     st_or(A, B, dim = c(0, 1, 2)) # returns points, lines (& if available surfaces)
   )
+
+  # test internal handling of geometrycollections
+  p1 <- st_point(c(0,0))
+  p2 <- st_point(c(3,3))
+  grid   <- st_sfc(p1, p2) %>% st_make_grid(n = 3)
+  multi  <- grid[c(1, 3, 7:9)] %>% st_union()
+  single <- grid[c(5, 8)] %>% st_union()
+
+  expect_true(
+    st_is(
+      st_intersection(multi, single),
+      "GEOMETRYCOLLECTION"
+      )
+  )
+
+  expect_true(
+    length(unique(st_dimension(st_or(multi, single, dim = 0:2)))) > 1
+  )
 })

@@ -7,8 +7,10 @@ reference:
   - title: Functions
     desc: ~
     contents:
+      - st_bbox_aligned
       - st_bbox_common
       - st_bbox_list
+      - st_cell_size
       - st_disaggregate
       - st_distance_along
       - st_erase_robust

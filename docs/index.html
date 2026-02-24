@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9007</span>
       </span>
     </div>
 
@@ -97,6 +97,8 @@
 <div class="section level1">
 <div class="page-header"><h1 id="sfhelpers">sfhelpers<a class="anchor" aria-label="anchor" href="#sfhelpers"></a>
 </h1></div>
+<!-- badges: start -->
+
 <div class="section level2">
 <h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a>
 </h2>
@@ -131,7 +133,7 @@
 <p><a href="https://a-benini.github.io/sfhelpers/reference/st_or.html"><code>sfhelpers::st_or()</code></a> is a <code>sf</code> equivalent of QGIS Union. <code><a href="reference/st_or.html">st_or()</a></code> returns a geometry set containing overlapping and non-overlapping parts of two input <code>sf</code> objects (or <code>sfc</code>s).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.13.1, GDAL 3.11.4, PROJ 9.7.0; sf_use_s2() is TRUE</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/a-benini/sfhelpers" class="external-link">sfhelpers</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># the two included demo sf-objects have partly identically named attribute columns</span></span>
@@ -168,7 +170,7 @@
 <span><span class="fu"><a href="reference/st_or.html">st_or</a></span><span class="op">(</span><span class="va">poly_1</span>, <span class="va">poly_2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: attribute variables are assumed to be spatially constant throughout</span></span>
 <span><span class="co">#&gt; all geometries</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-1.png" width="100%"></p>
+<p><img src="reference/figures/README-example-1.png" alt="" width="100%"></p>
 <p>For the rest of the functions included in <code>sfhelpers</code> see <a href="https://a-benini.github.io/sfhelpers/reference/index.html">here</a>.</p>
 </div>
 </div>
@@ -202,11 +204,16 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Attilio Benini <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Attilio Benini <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/a-benini/sfhelpers/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
@@ -219,7 +226,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

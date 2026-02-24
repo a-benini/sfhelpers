@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sfhelpers</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9007</span>
       </span>
     </div>
 
@@ -142,12 +142,12 @@ been set to <code>FALSE</code></p></dd>
 <span class="r-in"><span><span class="va">dsn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shape"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">st_layers_as_df</span><span class="op">(</span>x <span class="op">=</span> <span class="va">dsn</span>, drop_driver <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            layer_name        geometry_type features fields             crs_name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  storms_xyz_feature       3D Line String       71      1                 &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 storms_xyzm_feature Measured Line String       71      1                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  nc              Polygon      100     14                NAD27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2             olinda1              Polygon      470      6 GRS 1980(IUGG, 1980)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3          storms_xyz       3D Line String       71      0                 &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  nc              Polygon      100     14                NAD27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5         storms_xyzm Measured Line String       71      0                 &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6             olinda1              Polygon      470      6 GRS 1980(IUGG, 1980)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         storms_xyzm Measured Line String       71      0                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 storms_xyzm_feature Measured Line String       71      1                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  storms_xyz_feature       3D Line String       71      1                 &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           driver</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 ESRI Shapefile</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 ESRI Shapefile</span>
@@ -163,7 +163,7 @@ been set to <code>FALSE</code></p></dd>
 <span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">multiple_dsn</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">multiple_dsn</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">st_layers_as_df</span>, drop_driver <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span>use.names <span class="op">=</span> <span class="cn">FALSE</span>, idcol <span class="op">=</span> <span class="st">"dsn"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span>use.names <span class="op">=</span> <span class="cn">FALSE</span>, idcol <span class="op">=</span> <span class="st">"dsn"</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -178,7 +178,7 @@ been set to <code>FALSE</code></p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

@@ -1,11 +1,11 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://a-benini.github.io/sfhelpers/404.html</loc></url>
-<url><loc>https://a-benini.github.io/sfhelpers/LICENSE-text.html</loc></url>
-<url><loc>https://a-benini.github.io/sfhelpers/LICENSE.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/articles/index.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/articles/rbindlist_issues.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/authors.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/index.html</loc></url>
+<url><loc>https://a-benini.github.io/sfhelpers/LICENSE-text.html</loc></url>
+<url><loc>https://a-benini.github.io/sfhelpers/LICENSE.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/news/index.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/geos_stats.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/index.html</loc></url>
@@ -13,6 +13,7 @@
 <url><loc>https://a-benini.github.io/sfhelpers/reference/poly_2.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/sfhelpers-package.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/st_bbox_common.html</loc></url>
+<url><loc>https://a-benini.github.io/sfhelpers/reference/st_cell_size.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/st_disaggregate.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/st_distance_along.html</loc></url>
 <url><loc>https://a-benini.github.io/sfhelpers/reference/st_erase_robust.html</loc></url>

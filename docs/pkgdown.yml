@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   rbindlist_issues: rbindlist_issues.html
-last_built: 2026-02-24T08:36Z
+last_built: 2026-02-24T11:50Z
 urls:
   reference: https://a-benini.github.io/sfhelpers/reference
   article: https://a-benini.github.io/sfhelpers/articles

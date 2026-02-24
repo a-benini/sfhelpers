@@ -1,3 +1,8 @@
+# sfhelpers 0.0.0.9007
+* add function `st_bbox_aligned()`
+* add function `st_cell_size()`
+* minor fixes and updates (`sf` >= 1.0.24)
+
 # sfhelpers 0.0.0.9006
 * replace `lwgeom::st_perimeter()` by `sf::st_perimeter()` / update to `sf` >= 1.0.15.
 * minor improvements.

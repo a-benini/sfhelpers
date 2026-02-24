@@ -20,14 +20,14 @@ Imports:
     lifecycle,
     lwgeom,
     sf (>= 1.0.24),
+    stars,
+    terra,
     tmaptools,
     uuid
 Suggests: 
     dplyr,
     knitr,
     rmarkdown,
-    stars,
-    terra,
     testthat (>= 3.0.0),
     tmap,
     units,
